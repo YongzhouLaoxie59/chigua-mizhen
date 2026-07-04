@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>吃瓜迷阵 — 圆明园万花阵迷宫探索</title>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: linear-gradient(135deg, #0d1b0e 0%, #1a3320 50%, #0d1b0e 100%);
+  min-height: 100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-family: "Microsoft YaHei","PingFang SC",sans-serif;
+  overflow: hidden; position: relative; touch-action: none;
+}
+
+/* 右上角控制区 */
+#top-right-controls {
+  position: fixed; top: 10px; right: 10px; z-index: 60;
+  display: flex; flex-direction: column; gap: 5px; align-items: center;
+}
+.ctrl-icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid rgba(93,202,165,0.3);
+  background: rgba(15,40,20,0.75);
+  color: rgba(93,202,165,0.7);
+  font-size: 15px; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.ctrl-icon-btn:hover { background: rgba(93,202,165,0.15); }
+.ctrl-icon-btn:active { transform: scale(0.9); }
+.ctrl-icon-btn.active {
+  background: rgba(93,202,165,0.2);
+  color: #5DCAA5;
+  border-color: rgba(93,202,165,0.6);
+}
+.lang-separator { width: 20px; height: 1px; background: rgba(93,202,165,0.15); margin: 1px 0; }
+
+#game-wrap {
+  position: relative; z-index:1;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  width: 100%; max-width: 440px;
+}
+
+/* 状态栏 */
+#status-bar {
+  display:flex; justify-content:space-between; align-items:center;
+  width:100%; padding:8px 12px;
+  background: rgba(15,40,20,0.8); border-radius:10px;
+  border:1px solid rgba(93,202,165,0.2);
+}
+.status-item { display:flex; flex-direction:column; align-items:center; }
+.status-label { font-size:10px; color:rgba(93,202,165,0.6); letter-spacing:1px; }
+.status-value { font-size:15px; font-weight:700; color:#5DCAA5; }
+#energy-bar-wrap { width:80px; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; margin-top:2px; }
+#energy-bar { height:100%; background:linear-gradient(90deg,#97C459,#5DCAA5); border-radius:3px; transition:width 0.3s; }
+
+/* 3D容器 */
+#maze-3d {
+  width: 400px; height: 400px;
+  max-width: 100%;
+  border:2px solid rgba(93,202,165,0.15);
+  border-radius:12px;
+  background:#0a120a;
+  touch-action:none;
+  overflow:hidden;
+  position:relative;
+}
+#maze-3d canvas { display:block; }
+
+/* 技能栏 */
+#skill-bar {
+  display:flex; gap:8px; width:100%; justify-content:center;
+}
+.skill-btn {
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:8px 16px; border-radius:10px; border:2px solid;
+  background:rgba(15,40,20,0.6); cursor:pointer; transition:all 0.2s;
+  font-size:13px; font-weight:700;
+}
+.skill-btn.active { transform:scale(1.05); }
+.skill-cost { font-size:10px; opacity:0.7; }
+.skill-btn:disabled { opacity:0.3; cursor:not-allowed; }
+
+/* 控制按钮 */
+#ctrl-bar { display:flex; gap:8px; }
+.ctrl-btn {
+  padding:6px 14px; border-radius:8px; border:1px solid rgba(93,202,165,0.3);
+  background:rgba(15,40,20,0.6); color:#5DCAA5; cursor:pointer;
+  font-size:12px; transition:all 0.2s;
+}
+.ctrl-btn:hover { background:rgba(93,202,165,0.15); }
+.ctrl-btn:active { transform:scale(0.95); }
+
+/* 遮罩弹窗 */
+#overlay {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.75); z-index:100;
+  align-items:center; justify-content:center;
+}
+#overlay.show { display:flex; }
+.overlay-box {
+  background:linear-gradient(135deg,#1a3320,#0d1b0e);
+  border:2px solid rgba(93,202,165,0.3);
+  border-radius:16px; padding:30px 24px; text-align:center;
+  max-width:340px; width:90%;
+}
+.overlay-title { font-size:24px; font-weight:900; margin-bottom:8px; }
+.overlay-desc { font-size:14px; color:rgba(255,255,255,0.7); margin-bottom:16px; line-height:1.6; }
+.overlay-btn {
+  padding:12px 32px; border-radius:10px; border:none; cursor:pointer;
+  font-size:16px; font-weight:700; transition:all 0.2s;
+}
+
+/* 知识卡弹窗 */
+#kc-modal {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.8); z-index:200;
+  align-items:center; justify-content:center;
+}
+#kc-modal.show { display:flex; }
+.kc-box {
+  background:linear-gradient(135deg,#1a2a1e,#0d1b0e);
+  border:2px solid rgba(215,175,23,0.4);
+  border-radius:14px; padding:24px 20px; max-width:340px; width:90%;
+}
+.kc-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.kc-emoji { font-size:36px; }
+.kc-name { font-size:18px; font-weight:700; color:#FAC775; }
+.kc-title { font-size:13px; color:rgba(255,255,255,0.6); }
+.kc-intro { font-size:13px; color:rgba(255,255,255,0.8); line-height:1.7; margin-bottom:14px; text-indent:2em; }
+.kc-facts { font-size:12px; color:rgba(255,255,255,0.5); line-height:1.6; margin-bottom:16px; padding:10px; background:rgba(255,255,255,0.03); border-radius:8px; }
+.kc-btn {
+  width:100%; padding:10px; border-radius:8px; border:none; cursor:pointer;
+  background:#BA7517; color:#fff; font-size:14px; font-weight:700;
+}
+
+/* 开瓜弹窗 */
+#melon-pop {
+  display:none; position:fixed; top:50%; left:50%;
+  transform:translate(-50%,-50%); z-index:150;
+  pointer-events:none;
+}
+#melon-pop.show { display:block; }
+.melon-pop-inner {
+  text-align:center; animation:popUp 1.2s ease-out forwards;
+}
+@keyframes popUp {
+  0% { opacity:0; transform:scale(0.3) translateY(20px); }
+  30% { opacity:1; transform:scale(1.2) translateY(0); }
+  60% { opacity:1; transform:scale(1) translateY(-10px); }
+  100% { opacity:0; transform:scale(1) translateY(-60px); }
+}
+.melon-emoji { font-size:48px; }
+.melon-text { font-size:16px; font-weight:700; margin-top:4px; }
+.melon-energy { font-size:14px; }
+
+/* 提示 */
+#toast {
+  position:fixed; top:60px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,0.8); color:#5DCAA5; padding:8px 20px;
+  border-radius:20px; font-size:13px; z-index:90;
+  opacity:0; transition:opacity 0.3s; pointer-events:none;
+}
+#toast.show { opacity:1; }
+
+/* 通关庆祝文字 */
+#celebration-text {
+  position:fixed; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  font-size:48px; font-weight:900;
+  color:#FAC775;
+  text-shadow:0 0 20px rgba(250,199,117,0.6), 3px 3px 0 #1a3320;
+  z-index:80; pointer-events:none;
+  white-space:nowrap;
+}
+#celebration-text.show {
+  animation:celebratePop 2.5s ease-out forwards;
+}
+@keyframes celebratePop {
+  0% { opacity:0; transform:translate(-50%,-50%) scale(0); }
+  15% { opacity:1; transform:translate(-50%,-50%) scale(1.4); }
+  25% { transform:translate(-50%,-50%) scale(1); }
+  75% { opacity:1; transform:translate(-50%,-50%) scale(1.05); }
+  100% { opacity:0; transform:translate(-50%,-50%) scale(1.1); }
+}
+
+/* 入口页 */
+#entry-screen {
+  display:flex; flex-direction:column; align-items:center; gap:24px;
+  padding:40px 20px;
+}
+.entry-title {
+  font-size:36px; font-weight:900;
+  background:linear-gradient(180deg,#5DCAA5 0%,#1D9E75 50%,#0F6E56 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; letter-spacing:4px;
+}
+.entry-sub { font-size:14px; color:rgba(93,202,165,0.6); letter-spacing:6px; }
+.entry-mask { font-size:56px; animation:bounce 2s ease-in-out infinite; }
+@keyframes bounce { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
+.level-select { display:flex; flex-direction:column; gap:12px; width:100%; max-width:280px; }
+.level-btn {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:14px; border-radius:12px; border:2px solid rgba(93,202,165,0.3);
+  background:rgba(15,40,20,0.6); color:#5DCAA5; cursor:pointer;
+  font-size:16px; font-weight:700; transition:all 0.2s; text-decoration:none;
+}
+.level-btn:hover { background:rgba(93,202,165,0.15); border-color:rgba(93,202,165,0.6); }
+.level-btn.locked { opacity:0.3; cursor:not-allowed; }
+.level-btn-desc { font-size:11px; font-weight:400; opacity:0.6; }
+.entry-footer { font-size:12px; color:rgba(255,255,255,0.2); margin-top:20px; }
+
+.hidden { display:none !important; }
+</style>
+</head>
+<body>
+
+<!-- 背景音乐：Guzheng City by Kevin MacLeod (incompetech.com), CC BY 4.0 -->
+<audio id="bgm-audio" src="bgm_guzheng.mp3" loop preload="auto"></audio>
+
+<!-- 右上角控制区：音乐 + 多语种（竖向） -->
+<div id="top-right-controls">
+  <button class="ctrl-icon-btn" id="music-btn" onclick="toggleMusic()" title="Music">&#127925;</button>
+  <div class="lang-separator"></div>
+  <button class="ctrl-icon-btn lang-btn active" data-lang="zh" onclick="changeLanguage('zh')">&#20013;</button>
+  <button class="ctrl-icon-btn lang-btn" data-lang="en" onclick="changeLanguage('en')">EN</button>
+  <button class="ctrl-icon-btn lang-btn" data-lang="ja" onclick="changeLanguage('ja')">&#26085;</button>
+  <button class="ctrl-icon-btn lang-btn" data-lang="ko" onclick="changeLanguage('ko')">&#54620;</button>
+</div>
+
+<!-- 入口页 -->
+<div id="entry-screen">
+  <div class="entry-mask">&#127816;</div>
+  <div class="entry-title" id="entry-title-text">&#21507;&#29916;&#36855;&#38453;</div>
+  <div class="entry-sub" id="entry-sub-text"></div>
+  <div class="level-select" id="level-select-list"></div>
+  <div class="entry-footer" id="entry-footer-text"></div>
+</div>
+
+<!-- 游戏页 -->
+<div id="game-wrap" class="hidden">
+  <div id="status-bar">
+    <div class="status-item">
+      <div class="status-label" id="lbl-level"></div>
+      <div class="status-value" id="lv-display"></div>
+    </div>
+    <div class="status-item">
+      <div class="status-label" id="lbl-rank"></div>
+      <div class="status-value" id="rank-display" style="font-size:13px;"></div>
+    </div>
+    <div class="status-item">
+      <div class="status-label" id="lbl-energy"></div>
+      <div class="status-value" id="energy-display"></div>
+      <div id="energy-bar-wrap"><div id="energy-bar" style="width:50%"></div></div>
+    </div>
+    <div class="status-item">
+      <div class="status-label" id="lbl-collected"></div>
+      <div class="status-value" id="melon-count">0/7</div>
+    </div>
+  </div>
+
+  <div id="maze-3d"></div>
+
+  <div id="skill-bar">
+    <button class="skill-btn" id="skill-tunnel" onclick="toggleTunnel()"
+      style="border-color:rgba(215,175,23,0.4);color:#FAC775;">
+      <span id="skill-tunnel-name"></span>
+      <span class="skill-cost" id="skill-tunnel-cost"></span>
+    </button>
+  </div>
+
+  <div id="ctrl-bar">
+    <button class="ctrl-btn" id="btn-restart" onclick="restartLevel()"></button>
+    <button class="ctrl-btn" id="btn-back" onclick="backToEntry()"></button>
+  </div>
+</div>
+
+<!-- 通关/失败遮罩 -->
+<div id="overlay">
+  <div class="overlay-box">
+    <div class="overlay-title" id="overlay-title"></div>
+    <div class="overlay-desc" id="overlay-desc"></div>
+    <button class="overlay-btn" id="overlay-btn"></button>
+  </div>
+</div>
+
+<!-- 知识卡弹窗 -->
+<div id="kc-modal">
+  <div class="kc-box">
+    <div class="kc-header">
+      <div class="kc-emoji" id="kc-emoji"></div>
+      <div>
+        <div class="kc-name" id="kc-name"></div>
+        <div class="kc-title" id="kc-title"></div>
+      </div>
+    </div>
+    <div class="kc-intro" id="kc-intro"></div>
+    <div class="kc-facts" id="kc-facts"></div>
+    <button class="kc-btn" id="kc-btn" onclick="closeKc()"></button>
+  </div>
+</div>
+
+<!-- 开瓜弹出 -->
+<div id="melon-pop">
+  <div class="melon-pop-inner">
+    <div class="melon-emoji" id="pop-emoji"></div>
+    <div class="melon-text" id="pop-text"></div>
+    <div class="melon-energy" id="pop-energy"></div>
+  </div>
+</div>
+
+<!-- 通关庆祝文字 -->
+<div id="celebration-text" class="hidden"></div>
+
+<!-- 提示 -->
+<div id="toast"></div>
+
+<script>
+// ======================== 多语种数据 ========================
+var I18N = {
+  zh: {
+    title:'吃瓜迷阵', subtitle:'圆明园万花阵', footer:'五行遁术 · 盲盒吃瓜 · 等级晋升',
+    levelPrefix:'第', levelSuffix:'关', locked:'未解锁',
+    lblLevel:'关卡', lblRank:'称号', lblEnergy:'能量', lblCollected:'收集',
+    skillTunnel:'土遁术', skillTunnelCost:'消耗5能量',
+    btnRestart:'重新开局', btnBack:'返回选关',
+    btnNext:'下一关', overlayClear:'通关！',
+    overlayTime:'用时', overlayTimeUnit:'秒',
+    overlayCollected:'收集瓜果', overlayCollectedUnit:'种',
+    overlayEnergyLeft:'剩余能量',
+    kcContinue:'继续探索',
+    toastWall:'此路不通，换条路试试', toastNoEnergy:'能量不足！',
+    toastTunnelReady:'土遁术已就绪，点击相邻花墙穿越', toastTunnelUsed:'土遁穿墙！',
+    toastTunnelNoEnergy:'能量不足，无法使用土遁术',
+    bitterBuff:'苦尽甘来！',
+    energyPlus:'+', energyUnit:'能量',
+    exit:'出', musicOn:'音乐开', musicOff:'音乐关'
+  },
+  en: {
+    title:'Melon Maze', subtitle:'Yuanmingyuan Flower Maze', footer:'Five Elements · Blind Box · Rank Up',
+    levelPrefix:'Lv.', levelSuffix:'', locked:'Locked',
+    lblLevel:'Level', lblRank:'Title', lblEnergy:'Energy', lblCollected:'Found',
+    skillTunnel:'Earth Tunnel', skillTunnelCost:'Cost 5 energy',
+    btnRestart:'Restart', btnBack:'Levels',
+    btnNext:'Next Level', overlayClear:'CLEAR!',
+    overlayTime:'Time', overlayTimeUnit:'s',
+    overlayCollected:'Melons', overlayCollectedUnit:'types',
+    overlayEnergyLeft:'Energy Left',
+    kcContinue:'Continue',
+    toastWall:'Blocked! Try another way', toastNoEnergy:'Not enough energy!',
+    toastTunnelReady:'Earth Tunnel ready. Tap adjacent wall', toastTunnelUsed:'Tunnel through!',
+    toastTunnelNoEnergy:'Not enough energy for Earth Tunnel',
+    bitterBuff:'Sweet after bitter!',
+    energyPlus:'+', energyUnit:' energy',
+    exit:'OUT', musicOn:'Music On', musicOff:'Music Off'
+  },
+  ja: {
+    title:'吃瓜迷陣', subtitle:'円明園万花陣', footer:'五行遁術 · 盲盒吃瓜 · 等級昇進',
+    levelPrefix:'第', levelSuffix:'関', locked:'未解放',
+    lblLevel:'ステージ', lblRank:'称号', lblEnergy:'エネルギー', lblCollected:'収集',
+    skillTunnel:'土遁術', skillTunnelCost:'5エネルギー消費',
+    btnRestart:'リスタート', btnBack:'ステージ選択',
+    btnNext:'次の関', overlayClear:'クリア！',
+    overlayTime:'タイム', overlayTimeUnit:'秒',
+    overlayCollected:'瓜果収集', overlayCollectedUnit:'種',
+    overlayEnergyLeft:'残りエネルギー',
+    kcContinue:'探索続行',
+    toastWall:'通行止め！別の道を', toastNoEnergy:'エネルギー不足！',
+    toastTunnelReady:'土遁術発動。隣接する花壁をタップ', toastTunnelUsed:'土遁突破！',
+    toastTunnelNoEnergy:'土遁術のエネルギー不足',
+    bitterBuff:'苦尽甘来！',
+    energyPlus:'+', energyUnit:'エネルギー',
+    exit:'出', musicOn:'音楽オン', musicOff:'音楽オフ'
+  },
+  ko: {
+    title:'과일 미궁', subtitle:'원명원 만화진', footer:'오행둔술 · 블라인드박스 · 등급 승급',
+    levelPrefix:'제', levelSuffix:'관', locked:'잠김',
+    lblLevel:'스테이지', lblRank:'칭호', lblEnergy:'에너지', lblCollected:'수집',
+    skillTunnel:'토둔술', skillTunnelCost:'5 에너지 소모',
+    btnRestart:'다시 시작', btnBack:'스테이지',
+    btnNext:'다음 관', overlayClear:'클리어!',
+    overlayTime:'시간', overlayTimeUnit:'초',
+    overlayCollected:'과일 수집', overlayCollectedUnit:'종',
+    overlayEnergyLeft:'남은 에너지',
+    kcContinue:'계속 탐험',
+    toastWall:'막힘! 다른 길로', toastNoEnergy:'에너지 부족!',
+    toastTunnelReady:'토둔술 준비. 인접 꽃벽 탭', toastTunnelUsed:'토둔 돌파!',
+    toastTunnelNoEnergy:'토둔술 에너지 부족',
+    bitterBuff:'고진감래!',
+    energyPlus:'+', energyUnit:' 에너지',
+    exit:'출', musicOn:'음악 켜짐', musicOff:'음악 꺼짐'
+  }
+};
+
+// ======================== 瓜果基础数据 ========================
+var MELON_BASE = {
+  cucumber:  { emoji:'\u{1F952}', energy:1, prob:30 },
+  melon:     { emoji:'\u{1F348}', energy:2, prob:20 },
+  watermelon:{ emoji:'\u{1F349}', energy:3, prob:15 },
+  hami:      { emoji:'\u{1F34A}', energy:4, prob:10 },
+  winter:    { emoji:'\u{1F96C}', energy:3, prob:10 },
+  pumpkin:   { emoji:'\u{1F383}', energy:5, prob:8  },
+  bitter:    { emoji:'\u{1FAD2}', energy:0, prob:7  }
+};
+
+var MELON_I18N = {
+  zh: {
+    cucumber:  { name:'黄瓜',   title:'丝路胡瓜',
+      intro:'黄瓜原名胡瓜，西汉张骞通西域时引入中原。后赵石勒讳"胡"字，改称黄瓜。',
+      facts:'黄瓜含水量高达96%，是消暑佳品。中国各地均有栽培，品种繁多。' },
+    melon:     { name:'甜瓜',   title:'诗经雅瓜',
+      intro:'甜瓜是中国最古老的栽培瓜果之一，《诗经·豳风》有"七月食瓜"之句，距今已有三千余年。',
+      facts:'甜瓜品种繁多，哈密瓜、香瓜均为其变种。古人以瓜甜为吉祥之兆。' },
+    watermelon:{ name:'西瓜',   title:'瓜州来客',
+      intro:'西瓜原产非洲，约五代时期经丝绸之路传入中国，因来自西土故名"西瓜"。',
+      facts:'西瓜在中国栽培已逾千年，南宋文天祥有"西瓜饮"诗。中国现为世界最大西瓜生产国。' },
+    hami:      { name:'哈密瓜', title:'贡品甜瓜',
+      intro:'哈密瓜因清代哈密王进贡而得名，康熙帝赐名"哈密瓜"，列为御用贡品。',
+      facts:'哈密瓜主产新疆，含糖量高达15%-20%，有"瓜中之王"美誉。' },
+    winter:    { name:'冬瓜',   title:'冬储白玉',
+      intro:'冬瓜因成熟后表面白霜如冬雪而得名，是传统冬储蔬菜，寓意储福过冬。',
+      facts:'冬瓜可重达数十斤，耐储存，是中国北方冬季重要蔬菜。"冬瓜"虽名冬，实为夏秋收获。' },
+    pumpkin:   { name:'南瓜',   title:'金瓜纳福',
+      intro:'南瓜明代经东南亚传入，色金黄寓意丰收，民间有"金瓜送子"吉祥图案。',
+      facts:'南瓜全身可食：瓜肉、瓜籽、瓜花、瓜叶均可入菜。南瓜灯更是西方万圣节标志。' },
+    bitter:    { name:'苦瓜',   title:'苦尽甘来',
+      intro:'苦瓜又称君子菜，因苦瓜苦己不苦他——与它菜同煮不传苦味，喻君子之德。',
+      facts:'苦瓜富含维生素C，有清热解毒功效。吃到苦瓜触发"苦尽甘来"——5秒内透视周围盲盒！' }
+  },
+  en: {
+    cucumber:  { name:'Cucumber', title:'Silk Road Gourd',
+      intro:'Originally called "hugua" (barbarian melon), introduced to China via the Silk Road by Zhang Qian in the Western Han Dynasty. Renamed "huanggua" by Shi Le of the Later Zhao.',
+      facts:'Cucumbers are 96% water, perfect for summer cooling. Widely cultivated across China with numerous varieties.' },
+    melon:     { name:'Melon', title:'Book of Songs',
+      intro:'One of China\'s oldest cultivated fruits, mentioned in the "Book of Songs" (3,000+ years ago): "In the seventh month, we eat melons."',
+      facts:'Numerous varieties exist; cantaloupe and muskmelon are subspecies. Ancient Chinese considered sweet melons a sign of good fortune.' },
+    watermelon:{ name:'Watermelon', title:'Western Visitor',
+      intro:'Originating in Africa, watermelons reached China via the Silk Road around the Five Dynasties period. Named "western melon" for its western origin.',
+      facts:'Cultivated in China for over 1,000 years. Poet Wen Tianxiang wrote "Watermelon Drink." China is now the world\'s largest watermelon producer.' },
+    hami:      { name:'Hami Melon', title:'Imperial Tribute',
+      intro:'Named after the Hami king who presented it as tribute to Emperor Kangxi in the Qing Dynasty. Classified as an imperial tribute fruit.',
+      facts:'Primarily grown in Xinjiang with 15-20% sugar content. Known as the "King of Melons."' },
+    winter:    { name:'Winter Melon', title:'Jade in Snow',
+      intro:'Named for the white frost resembling winter snow on its mature surface. A traditional winter storage vegetable symbolizing prosperity.',
+      facts:'Can weigh dozens of kilograms. Stores well, an important winter vegetable in northern China. Harvested in summer-autumn despite the name.' },
+    pumpkin:   { name:'Pumpkin', title:'Golden Blessing',
+      intro:'Introduced to China via Southeast Asia in the Ming Dynasty. Its golden color symbolizes harvest, and folk art features "golden gourd bringing children" as an auspicious motif.',
+      facts:'Every part is edible: flesh, seeds, flowers, and leaves. Pumpkin lanterns are iconic in Western Halloween.' },
+    bitter:    { name:'Bitter Melon', title:'Sweet After Bitter',
+      intro:'Also called the "gentleman\'s vegetable" — bitter to itself but not to other foods cooked with it, symbolizing noble virtue.',
+      facts:'Rich in vitamin C with heat-clearing properties. Eating it triggers "Sweet After Bitter" — 5-second radar vision of nearby melon boxes!' }
+  },
+  ja: {
+    cucumber:  { name:'キュウリ', title:'シルクロードの瓜',
+      intro:'元々「胡瓜」と呼ばれ、前漢の張騫がシルクロード経由で中国に導入。後趙の石勒が「胡」を忌み「黄瓜」と改称。',
+      facts:'キュウリは水分96%、夏の冷却に最適。中国各地で栽培され品種も豊富。' },
+    melon:     { name:'メロン', title:'詩経の瓜',
+      intro:'中国最古の栽培果物の一つ。「詩経・豳風」に「七月に瓜を食す」とあり、3千年以上の歴史。',
+      facts:'品種は多数。ハミウリやマスクメロンも変種。古代中国では甘い瓜を吉祥の兆しとした。' },
+    watermelon:{ name:'スイカ', title:'西からの来客',
+      intro:'アフリカ原産。五代時期にシルクロード経由で中国に伝来。西から来たため「西瓜」と名付けられた。',
+      facts:'中国での栽培は千年以上。詩人の文天祥が「西瓜飲」の詩を残す。中国は世界最大のスイカ生産国。' },
+    hami:      { name:'ハミウリ', title:'貢品の瓜',
+      intro:'清代のハミ王が康熙帝に貢物として献上したことに由来。康熙帝が「ハミ瓜」と命名し、御用品となった。',
+      facts:'主に新疆で生産。糖度15-20%。「瓜の王様」と称される。' },
+    winter:    { name:'冬瓜', title:'雪中の白玉',
+      intro:'成熟すると表面に冬の雪のような白い霜ができることから命名。冬の保存野菜として伝統的。',
+      facts:'数十キロにもなる。保存性が高く、中国北方の重要な冬野菜。「冬瓜」だが夏秋に収穫。' },
+    pumpkin:   { name:'南瓜', title:'金瓜の福',
+      intro:'明代に東南アジア経由で中国に伝来。黄金色は豊作を象徴。「金瓜送子」の吉祥図案がある。',
+      facts:'果肉、種、花、葉まで全て食用。ジャックランタンは西洋ハロウィンの象徴。' },
+    bitter:    { name:'苦瓜', title:'苦尽甘来',
+      intro:'「君子菜」とも呼ばれる。自分は苦くても他の料理に苦味を移さないことから君子の徳に例える。',
+      facts:'ビタミンC豊富で清热解毒効果あり。食べると「苦尽甘来」発動——5秒間周囲の盲盒が透視！' }
+  },
+  ko: {
+    cucumber:  { name:'오이', title:'실크로드의 과일',
+      intro:'원래 "호과"라 불렸으며, 전한 장건이 실크로드를 통해 중국에 도입. 후조 석륵이 "호"를 꺼려 "황과"로 개칭.',
+      facts:'오이는 수분 96%로 여름철 더위 식히기에 최적. 중국 각지에서 재배되며 품종이 다양.' },
+    melon:     { name:'참외', title:'시경의 과일',
+      intro:'중국에서 가장 오래된 재배 과일 중 하나. 「시경」에 "칠월에 과일을 먹는다"는 구절이 있어 3천년 이상의 역사.',
+      facts:'품종이 다양. 하미과와 향과도 변종. 고대 중국에서 달콤한 과일을 길조로 여김.' },
+    watermelon:{ name:'수박', title:'서쪽에서 온 손님',
+      intro:'아프리카 원산. 오대 시기 실크로드를 통해 중국에 전래. 서쪽에서 왔다고 하여 "서과"라 명명.',
+      facts:'중국 재배 역사 천년 이상. 시인 문천상이 "수박음" 시를 남김. 중국은 세계 최대 수박 생산국.' },
+    hami:      { name:'하미과', title:'공물의 과일',
+      intro:'청대 하미왕이 강희제에게 공물로 바친 데서 유래. 강희제가 "하미과"로 명명하여 어용품이 됨.',
+      facts:'주로 신장에서 생산. 당도 15-20%. "과일의 왕"으로 불림.' },
+    winter:    { name:'동과', title:'눈 속의 백옥',
+      intro:'익으면 표면에 겨울 눈 같은 흰 서리가 생겨 명명. 전통적 겨울 저장 채소로 번영을 상징.',
+      facts:'수십 킬로까지 자람. 저장성이 좋아 중국 북방의 중요 겨울 채소. 이름과 달리 여름가을에 수확.' },
+    pumpkin:   { name:'호박', title:'금과의 축복',
+      intro:'명대 동남아시아를 통해 중국에 전래. 황금빛은 풍작을 상징. "금과송자" 길상 문양이 있음.',
+      facts:'과육, 씨, 꽃, 잎까지 모두 식용. 호박등은 서양 할로윈의 상징.' },
+    bitter:    { name:'여주', title:'고진감래',
+      intro:'"군자채"라도 불린. 자신은 쓰지만 다른 요리에 쓴맛을 옮기지 않아 군자의 덕에 비유.',
+      facts:'비타민C 풍부, 청열해독 효과. 먹으면 "고진감래" 발동 — 5초간 주변 맹박스 투시!' }
+  }
+};
+
+var MELON_KEYS = Object.keys(MELON_BASE);
+
+// ======================== 关卡数据 ========================
+// 0=路径 1=花墙 2=盲盒 3=出口 4=起点
+var LEVELS = [
+  {
+    names:{ zh:'初入花阵', en:'First Steps', ja:'初陣の花', ko:'첫 걸음' },
+    descs:{ zh:'万花阵入门，孤岛迷阵', en:'Beginner maze with islands', ja:'入門編、孤島あり', ko:'입문, 섬 미로' },
+    grid:[
+      [4,0,0,0,1,0,0,0,0,0],
+      [0,1,1,0,1,0,1,1,1,0],
+      [0,0,0,0,0,0,0,2,0,0],
+      [1,1,0,1,1,1,1,0,1,0],
+      [0,0,0,0,2,1,0,0,0,0],
+      [0,1,1,1,0,1,0,1,1,0],
+      [0,2,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,1,1,0,1,0],
+      [0,0,0,2,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,1,0,3]
+    ]
+  },
+  {
+    names:{ zh:'花径通幽', en:'Hidden Path', ja:'花の小径', ko:'꽃길의 오솔길' },
+    descs:{ zh:'岔路增多，土遁寻宝', en:'More forks, tunnel for bonus', ja:'分岐増加、土遁で宝探し', ko:'갈림길 증가, 토둔으로 보물' },
+    grid:[
+      [4,0,0,1,0,0,0,2,0,0,0,0],
+      [0,1,0,1,0,1,1,1,0,0,1,0],
+      [0,1,0,0,0,1,0,0,0,1,1,0],
+      [0,0,1,1,1,1,0,1,1,0,1,0],
+      [1,2,0,0,2,0,0,1,0,1,0,1],
+      [0,0,1,0,1,1,1,1,0,0,0,0],
+      [0,1,1,0,0,0,0,0,0,1,0,1],
+      [0,0,0,1,1,1,0,1,2,0,0,0],
+      [0,1,0,0,0,1,0,0,1,1,1,0],
+      [0,1,1,1,0,0,0,1,2,0,0,0],
+      [0,0,0,0,0,1,1,1,0,0,1,0],
+      [0,1,1,1,0,0,0,0,0,1,0,3]
+    ]
+  },
+  {
+    names:{ zh:'万花深处', en:'Deep in Flowers', ja:'万花の奥', ko:'만화 깊은 곳' },
+    descs:{ zh:'花墙封路，土遁必用', en:'Walls block path, tunnel required', ja:'花壁が道を塞ぐ、土遁必須', ko:'꽃벽이 길 막음, 토둔 필수' },
+    grid:[
+      [4,0,0,0,1,0,0,2,0,0,0,1,0,0],
+      [0,1,1,0,1,0,1,1,1,0,1,1,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,0,1,1,1,1,0,1,1,1,0,1,0],
+      [0,0,0,1,2,0,0,0,1,0,0,0,1,0],
+      [0,1,1,1,0,1,0,1,1,0,1,0,0,0],
+      [0,0,0,0,0,1,0,0,0,0,1,1,1,0],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [0,0,0,1,0,0,2,0,0,0,1,0,0,0],
+      [0,1,1,1,0,0,0,0,2,0,1,1,1,0],
+      [0,0,0,0,0,1,0,0,0,0,0,0,0,2],
+      [0,1,1,0,1,1,1,0,1,1,1,0,1,0],
+      [0,0,0,0,0,1,0,0,0,1,0,0,0,0],
+      [0,0,1,0,0,0,0,1,0,0,0,0,0,3]
+    ]
+  }
+];
+
+// ======================== 等级数据 ========================
+var RANKS = [
+  { names:{ zh:'吃瓜新手', en:'Melon Rookie', ja:'吃瓜ルーキー', ko:'과일 루키' }, maxEnergy:20, color:'#97C459' },
+  { names:{ zh:'吃瓜小咖', en:'Melon Fan',    ja:'吃瓜ファン',   ko:'과일 팬'    }, maxEnergy:30, color:'#5DCAA5' },
+  { names:{ zh:'吃瓜达人', en:'Melon Expert', ja:'吃瓜プロ',     ko:'과일 프로'  }, maxEnergy:50, color:'#FAC775' },
+  { names:{ zh:'吃瓜大神', en:'Melon Master', ja:'吃瓜マスター', ko:'과일 마스터'}, maxEnergy:80, color:'#D85A30' }
+];
+
+// ======================== 游戏状态 ========================
+var G = {
+  levelIdx: 0,
+  grid: null,
+  playerX: 0, playerY: 0,
+  energy: 10,
+  explored: {},
+  melons: {},
+  collected: {},
+  tunnelSelected: false,
+  radarTime: 0,
+  cellSize: 40,
+  cols: 10, rows: 10,
+  startTime: 0,
+  paused: false,
+  unlockedLevels: 1,
+  exitGridX: -1,
+  exitGridY: -1
+};
+
+// ======================== 多语种函数 ========================
+var currentLang = localStorage.getItem('eatgua_lang') || 'zh';
+
+function t(key) {
+  return (I18N[currentLang] && I18N[currentLang][key]) || I18N.zh[key] || key;
+}
+
+function tm(melonKey, field) {
+  var langData = MELON_I18N[currentLang] || MELON_I18N.zh;
+  return (langData[melonKey] && langData[melonKey][field]) || MELON_I18N.zh[melonKey][field] || '';
+}
+
+function tl(levelIdx, field) {
+  var lv = LEVELS[levelIdx];
+  return (lv[field+'s'][currentLang]) || lv[field+'s'].zh;
+}
+
+function tr(rankIdx) {
+  return RANKS[Math.min(rankIdx, RANKS.length-1)].names[currentLang] || RANKS[Math.min(rankIdx, RANKS.length-1)].names.zh;
+}
+
+function changeLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('eatgua_lang', lang);
+  updateLangButtons();
+  applyI18n();
+}
+
+function updateLangButtons() {
+  var btns = document.querySelectorAll('.lang-btn');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].dataset.lang === currentLang) btns[i].classList.add('active');
+    else btns[i].classList.remove('active');
+  }
+}
+
+function applyI18n() {
+  document.getElementById('entry-title-text').textContent = t('title');
+  document.getElementById('entry-sub-text').textContent = t('subtitle');
+  document.getElementById('entry-footer-text').textContent = t('footer');
+  document.getElementById('lbl-level').textContent = t('lblLevel');
+  document.getElementById('lbl-rank').textContent = t('lblRank');
+  document.getElementById('lbl-energy').textContent = t('lblEnergy');
+  document.getElementById('lbl-collected').textContent = t('lblCollected');
+  document.getElementById('skill-tunnel-name').textContent = t('skillTunnel');
+  document.getElementById('skill-tunnel-cost').textContent = t('skillTunnelCost');
+  document.getElementById('btn-restart').textContent = t('btnRestart');
+  document.getElementById('btn-back').textContent = t('btnBack');
+  document.getElementById('kc-btn').textContent = t('kcContinue');
+
+  if (!document.getElementById('entry-screen').classList.contains('hidden')) {
+    renderLevelSelect();
+  }
+  if (!document.getElementById('game-wrap').classList.contains('hidden')) {
+    updateUI();
+  }
+  render();
+}
+
+// ======================== 音频系统 ========================
+// 背景音乐：Guzheng City by Kevin MacLeod (incompetech.com)
+// 许可：CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+var audioCtx = null;
+var musicEnabled = (localStorage.getItem('eatgua_music') === '1');
+var bgmAudio = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) { audioCtx = null; }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function initBgm() {
+  if (!bgmAudio) {
+    bgmAudio = document.getElementById('bgm-audio');
+    if (bgmAudio) {
+      bgmAudio.volume = 0.35;
+      bgmAudio.loop = true;
+    }
+  }
+}
+
+function tryStartBgm() {
+  if (musicEnabled) {
+    initBgm();
+    if (bgmAudio && bgmAudio.paused) {
+      bgmAudio.play().catch(function(){});
+    }
+  }
+}
+
+function toggleMusic() {
+  initAudio();
+  initBgm();
+  musicEnabled = !musicEnabled;
+  localStorage.setItem('eatgua_music', musicEnabled ? '1' : '0');
+  if (musicEnabled && bgmAudio) {
+    bgmAudio.play().catch(function(){});
+  } else if (bgmAudio) {
+    bgmAudio.pause();
+  }
+  updateMusicButton();
+}
+
+function updateMusicButton() {
+  var btn = document.getElementById('music-btn');
+  if (musicEnabled) {
+    btn.innerHTML = '\u{1F3B5}';
+    btn.classList.add('active');
+    btn.title = t('musicOff');
+  } else {
+    btn.innerHTML = '\u{1F507}';
+    btn.classList.remove('active');
+    btn.title = t('musicOn');
+  }
+}
+
+function playLevelCompleteSound() {
+  if (!audioCtx) return;
+  var notes = [523.25, 659.25, 783.99, 1046.50];
+  var now = audioCtx.currentTime;
+  for (var i = 0; i < notes.length; i++) {
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = notes[i];
+    gain.gain.setValueAtTime(0, now + i * 0.12);
+    gain.gain.linearRampToValueAtTime(0.18, now + i * 0.12 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.5);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now + i * 0.12);
+    osc.stop(now + i * 0.12 + 0.5);
+  }
+}
+
+// ======================== 3D 渲染系统 ========================
+// Three.js 低多边形3D渲染 — 替换原Canvas 2D
+var CELL_3D = 4;       // 每格世界单位
+var WALL_HEIGHT = 3;   // 花墙高度
+var VIEW_SIZE = 50;    // 正交相机可视范围
+
+var scene3D = null;
+var camera3D = null;
+var renderer3D = null;
+var raycaster3D = null;
+var mouse3D = null;
+var groundPlane3D = null;
+
+var groundTiles3D = {};
+var wallMeshes3D = {};
+var melonMeshes3D = {};
+var exitMesh3D = null;
+var playerGroup3D = null;
+var highlightMeshes3D = [];
+var celebrationParticles3D = [];
+var radarSphere3D = null;
+
+var playerTargetX3D = 0;
+var playerTargetZ3D = 0;
+var animFrameId3D = null;
+
+// 瓜果3D颜色
+var MELON_COLORS = {
+  cucumber:  0x6b8e23,
+  melon:     0xdda420,
+  watermelon:0x2e7d32,
+  hami:      0xe8a542,
+  winter:    0xb0c4a0,
+  pumpkin:   0xd85a30,
+  bitter:    0x556b2f
+};
+
+function init3D() {
+  if (typeof THREE === 'undefined') {
+    var container = document.getElementById('maze-3d');
+    container.innerHTML = '<div style="color:#D85A30;padding:60px 20px;text-align:center;font-size:14px;line-height:2;">3D\u5f15\u64ce\u52a0\u8f7d\u5931\u8d25<br>\u8bf7\u68c0\u67e5\u7f51\u7edc\u8fde\u63a5\u540e\u5237\u65b0</div>';
+    return false;
+  }
+
+  // 场景
+  scene3D = new THREE.Scene();
+  scene3D.background = new THREE.Color(0x0a120a);
+
+  // 正交相机 — 干净的游戏视角，无透视畸变
+  var aspect = 1;
+  camera3D = new THREE.OrthographicCamera(
+    -VIEW_SIZE * aspect / 2, VIEW_SIZE * aspect / 2,
+    VIEW_SIZE / 2, -VIEW_SIZE / 2,
+    0.1, 200
+  );
+
+  // 射线检测器
+  raycaster3D = new THREE.Raycaster();
+  mouse3D = new THREE.Vector2();
+
+  // 渲染器
+  var container = document.getElementById('maze-3d');
+  renderer3D = new THREE.WebGLRenderer({ antialias: true });
+  renderer3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer3D.shadowMap.enabled = true;
+  renderer3D.shadowMap.type = THREE.PCFSoftShadowMap;
+  container.appendChild(renderer3D.domElement);
+
+  // 地面射线检测平面（不可见）
+  var gpGeo = new THREE.PlaneGeometry(200, 200);
+  var gpMat = new THREE.MeshBasicMaterial({ visible: false });
+  groundPlane3D = new THREE.Mesh(gpGeo, gpMat);
+  groundPlane3D.rotation.x = -Math.PI / 2;
+  groundPlane3D.position.set(20, 0, 20);
+  scene3D.add(groundPlane3D);
+
+  // 灯光
+  var ambient = new THREE.AmbientLight(0x445544, 0.35);
+  scene3D.add(ambient);
+
+  var dirLight = new THREE.DirectionalLight(0xffffff, 0.75);
+  dirLight.position.set(30, 50, 15);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 1024;
+  dirLight.shadow.mapSize.height = 1024;
+  dirLight.shadow.camera.left = -25;
+  dirLight.shadow.camera.right = 25;
+  dirLight.shadow.camera.top = 25;
+  dirLight.shadow.camera.bottom = -25;
+  dirLight.shadow.camera.near = 0.5;
+  dirLight.shadow.camera.far = 100;
+  scene3D.add(dirLight);
+
+  var hemi = new THREE.HemisphereLight(0x88aa88, 0x223322, 0.25);
+  scene3D.add(hemi);
+
+  // 3D输入事件
+  renderer3D.domElement.addEventListener('click', on3DClick);
+  renderer3D.domElement.addEventListener('touchstart', on3DTouchStart, { passive: false });
+  renderer3D.domElement.addEventListener('touchend', on3DTouchEnd, { passive: false });
+
+  resize3D();
+  return true;
+}
+
+function resize3D() {
+  if (!renderer3D) return;
+  // 动态视野：根据迷宫尺寸调整
+  var worldSize = Math.max(G.cols || 10, G.rows || 10) * CELL_3D;
+  VIEW_SIZE = worldSize + 12;
+  var container = document.getElementById('maze-3d');
+  var w = Math.min(400, container.clientWidth || 400);
+  var h = w;
+  renderer3D.setSize(w, h);
+  var aspect = w / h;
+  camera3D.left = -VIEW_SIZE * aspect / 2;
+  camera3D.right = VIEW_SIZE * aspect / 2;
+  camera3D.top = VIEW_SIZE / 2;
+  camera3D.bottom = -VIEW_SIZE / 2;
+  camera3D.updateProjectionMatrix();
+}
+
+function buildMaze3D() {
+  clearMaze3D();
+
+  // 地面瓦片
+  for (var y = 0; y < G.rows; y++) {
+    for (var x = 0; x < G.cols; x++) {
+      var geo = new THREE.PlaneGeometry(CELL_3D - 0.15, CELL_3D - 0.15);
+      var mat = new THREE.MeshStandardMaterial({
+        color: 0x080f08,
+        roughness: 0.9
+      });
+      var tile = new THREE.Mesh(geo, mat);
+      tile.rotation.x = -Math.PI / 2;
+      tile.position.set(x * CELL_3D + CELL_3D/2, 0, y * CELL_3D + CELL_3D/2);
+      tile.receiveShadow = true;
+      scene3D.add(tile);
+      groundTiles3D[x + ',' + y] = tile;
+    }
+  }
+
+  // 花墙、出口、盲盒
+  for (var y = 0; y < G.rows; y++) {
+    for (var x = 0; x < G.cols; x++) {
+      var cell = G.grid[y][x];
+      var key = x + ',' + y;
+      var wx = x * CELL_3D + CELL_3D/2;
+      var wz = y * CELL_3D + CELL_3D/2;
+
+      if (cell === 1) {
+        // 花墙（绿篱）
+        var wGeo = new THREE.BoxGeometry(CELL_3D - 0.3, WALL_HEIGHT, CELL_3D - 0.3);
+        var wMat = new THREE.MeshStandardMaterial({
+          color: 0x2a8b5c,
+          roughness: 0.9,
+          metalness: 0.0
+        });
+        // 轻微颜色变化，增加自然感
+        var v = (Math.random() - 0.5) * 0.12;
+        wMat.color.r = Math.max(0, Math.min(1, wMat.color.r + v));
+        wMat.color.g = Math.max(0, Math.min(1, wMat.color.g + v));
+        wMat.color.b = Math.max(0, Math.min(1, wMat.color.b + v));
+
+        var wall = new THREE.Mesh(wGeo, wMat);
+        wall.position.set(wx, WALL_HEIGHT/2, wz);
+        wall.castShadow = true;
+        wall.receiveShadow = true;
+        wall.visible = false;
+        scene3D.add(wall);
+        wallMeshes3D[key] = wall;
+
+        // 花墙顶部小花装饰
+        if (Math.random() > 0.4) {
+          var fGeo = new THREE.SphereGeometry(0.25, 6, 4);
+          var fColor = Math.random() > 0.5 ? 0xF0997B : 0xFAC775;
+          var fMat = new THREE.MeshStandardMaterial({ color: fColor, roughness: 0.6 });
+          var flower = new THREE.Mesh(fGeo, fMat);
+          flower.position.set(
+            wx + (Math.random() - 0.5) * 2,
+            WALL_HEIGHT + 0.15,
+            wz + (Math.random() - 0.5) * 2
+          );
+          flower.castShadow = true;
+          flower.visible = false;
+          scene3D.add(flower);
+          wall.userData.flower = flower;
+        }
+      }
+
+      if (cell === 3) {
+        // 出口传送门
+        G.exitGridX = x;
+        G.exitGridY = y;
+        var rankColor = RANKS[Math.min(G.levelIdx, RANKS.length-1)].color;
+        var colorHex = parseInt(rankColor.replace('#', '0x'));
+        var eGeo = new THREE.CylinderGeometry(1.4, 1.4, WALL_HEIGHT, 16);
+        var eMat = new THREE.MeshStandardMaterial({
+          color: colorHex,
+          emissive: colorHex,
+          emissiveIntensity: 0.6,
+          transparent: true,
+          opacity: 0.65
+        });
+        exitMesh3D = new THREE.Mesh(eGeo, eMat);
+        exitMesh3D.position.set(wx, WALL_HEIGHT/2, wz);
+        exitMesh3D.visible = false;
+        scene3D.add(exitMesh3D);
+
+        // 出口光柱
+        var beamGeo = new THREE.CylinderGeometry(0.8, 1.4, 8, 16);
+        var beamMat = new THREE.MeshBasicMaterial({
+          color: colorHex,
+          transparent: true,
+          opacity: 0.12
+        });
+        var beam = new THREE.Mesh(beamGeo, beamMat);
+        beam.position.set(wx, 5, wz);
+        beam.visible = false;
+        scene3D.add(beam);
+        exitMesh3D.userData.beam = beam;
+      }
+
+      if (G.melons[key]) {
+        // 盲盒（金色浮空方块）
+        var mGeo = new THREE.BoxGeometry(1.4, 1.4, 1.4);
+        var mMat = new THREE.MeshStandardMaterial({
+          color: 0xBA7517,
+          emissive: 0x331100,
+          roughness: 0.4,
+          metalness: 0.3
+        });
+        var melon = new THREE.Mesh(mGeo, mMat);
+        melon.position.set(wx, 1.6, wz);
+        melon.castShadow = true;
+        melon.visible = false;
+        melon.userData = {
+          phase: Math.random() * Math.PI * 2,
+          melonKey: G.melons[key],
+          key: key
+        };
+        scene3D.add(melon);
+        melonMeshes3D[key] = melon;
+      }
+    }
+  }
+
+  // 玩家角色
+  playerGroup3D = new THREE.Group();
+
+  var bodyGeo = new THREE.SphereGeometry(1.1, 16, 12);
+  var bodyMat = new THREE.MeshStandardMaterial({ color: 0xD85A30, roughness: 0.6 });
+  var body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.castShadow = true;
+  playerGroup3D.add(body);
+
+  var headGeo = new THREE.SphereGeometry(0.65, 12, 10);
+  var headMat = new THREE.MeshStandardMaterial({ color: 0x444441, roughness: 0.7 });
+  var head = new THREE.Mesh(headGeo, headMat);
+  head.position.y = 1.3;
+  head.castShadow = true;
+  playerGroup3D.add(head);
+
+  // 眼睛
+  var eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+  var eyePupilMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+  var eyeWhiteGeo = new THREE.SphereGeometry(0.18, 8, 6);
+  var eyePupilGeo = new THREE.SphereGeometry(0.09, 6, 4);
+
+  var leftEye = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
+  leftEye.position.set(-0.28, 1.4, 0.55);
+  playerGroup3D.add(leftEye);
+
+  var rightEye = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
+  rightEye.position.set(0.28, 1.4, 0.55);
+  playerGroup3D.add(rightEye);
+
+  var leftPupil = new THREE.Mesh(eyePupilGeo, eyePupilMat);
+  leftPupil.position.set(-0.28, 1.4, 0.72);
+  playerGroup3D.add(leftPupil);
+
+  var rightPupil = new THREE.Mesh(eyePupilGeo, eyePupilMat);
+  rightPupil.position.set(0.28, 1.4, 0.72);
+  playerGroup3D.add(rightPupil);
+
+  // 小帽子
+  var hatGeo = new THREE.ConeGeometry(0.7, 0.7, 8);
+  var hatMat = new THREE.MeshStandardMaterial({ color: 0xD85A30, roughness: 0.5 });
+  var hat = new THREE.Mesh(hatGeo, hatMat);
+  hat.position.y = 2.2;
+  hat.castShadow = true;
+  playerGroup3D.add(hat);
+
+  playerTargetX3D = G.playerX * CELL_3D + CELL_3D/2;
+  playerTargetZ3D = G.playerY * CELL_3D + CELL_3D/2;
+  playerGroup3D.position.set(playerTargetX3D, 0, playerTargetZ3D);
+  scene3D.add(playerGroup3D);
+
+  // 雷达球（苦瓜buff时显示）
+  var rGeo = new THREE.SphereGeometry(CELL_3D * 4, 16, 12);
+  var rMat = new THREE.MeshBasicMaterial({
+    color: 0xFAC775,
+    transparent: true,
+    opacity: 0.08,
+    wireframe: true,
+    visible: false
+  });
+  radarSphere3D = new THREE.Mesh(rGeo, rMat);
+  scene3D.add(radarSphere3D);
+
+  // 更新地面射线检测平面位置
+  if (groundPlane3D) {
+    groundPlane3D.position.set((G.cols * CELL_3D) / 2, 0, (G.rows * CELL_3D) / 2);
+  }
+
+  // 相机定位（根据迷宫尺寸动态调整角度）
+  var centerX = (G.cols * CELL_3D) / 2;
+  var centerZ = (G.rows * CELL_3D) / 2;
+  var camHeight = Math.max(30, G.rows * CELL_3D * 0.7);
+  var camOffset = Math.max(16, G.cols * CELL_3D * 0.4);
+  camera3D.position.set(centerX, camHeight, centerZ + camOffset);
+  camera3D.lookAt(centerX, 0, centerZ);
+
+  resize3D();
+  updateScene3D();
+}
+
+function clearMaze3D() {
+  function disposeMesh(m) {
+    if (!m) return;
+    scene3D.remove(m);
+    if (m.geometry) m.geometry.dispose();
+    if (m.material) m.material.dispose();
+    if (m.userData && m.userData.flower) {
+      scene3D.remove(m.userData.flower);
+      m.userData.flower.geometry.dispose();
+      m.userData.flower.material.dispose();
+    }
+    if (m.userData && m.userData.beam) {
+      scene3D.remove(m.userData.beam);
+      m.userData.beam.geometry.dispose();
+      m.userData.beam.material.dispose();
+    }
+  }
+
+  for (var key in groundTiles3D) disposeMesh(groundTiles3D[key]);
+  groundTiles3D = {};
+
+  for (var key in wallMeshes3D) disposeMesh(wallMeshes3D[key]);
+  wallMeshes3D = {};
+
+  for (var key in melonMeshes3D) disposeMesh(melonMeshes3D[key]);
+  melonMeshes3D = {};
+
+  disposeMesh(exitMesh3D);
+  exitMesh3D = null;
+
+  if (playerGroup3D) {
+    scene3D.remove(playerGroup3D);
+    playerGroup3D.traverse(function(child) {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) child.material.dispose();
+    });
+    playerGroup3D = null;
+  }
+
+  if (radarSphere3D) {
+    scene3D.remove(radarSphere3D);
+    radarSphere3D.geometry.dispose();
+    radarSphere3D.material.dispose();
+    radarSphere3D = null;
+  }
+
+  for (var i = 0; i < highlightMeshes3D.length; i++) {
+    scene3D.remove(highlightMeshes3D[i]);
+    highlightMeshes3D[i].geometry.dispose();
+    highlightMeshes3D[i].material.dispose();
+  }
+  highlightMeshes3D = [];
+
+  for (var i = 0; i < celebrationParticles3D.length; i++) {
+    scene3D.remove(celebrationParticles3D[i]);
+    if (celebrationParticles3D[i].geometry) celebrationParticles3D[i].geometry.dispose();
+    if (celebrationParticles3D[i].material) celebrationParticles3D[i].material.dispose();
+  }
+  celebrationParticles3D = [];
+}
+
+function updateScene3D() {
+  if (!scene3D || !G.grid) return;
+
+  // 迷雾视野：更新地面颜色和物体可见性
+  for (var key in groundTiles3D) {
+    if (G.explored[key]) {
+      groundTiles3D[key].material.color.setHex(0x2a3a2e);
+    } else {
+      groundTiles3D[key].material.color.setHex(0x080f08);
+    }
+  }
+
+  for (var key in wallMeshes3D) {
+    var vis = !!G.explored[key];
+    wallMeshes3D[key].visible = vis;
+    if (wallMeshes3D[key].userData.flower) {
+      wallMeshes3D[key].userData.flower.visible = vis;
+    }
+  }
+
+  for (var key in melonMeshes3D) {
+    var mVis = !!G.explored[key];
+    melonMeshes3D[key].visible = mVis;
+
+    // 雷达状态：盲盒显示瓜果对应颜色
+    if (mVis && G.radarTime > 0 && melonMeshes3D[key].userData.melonKey) {
+      var mc = MELON_COLORS[melonMeshes3D[key].userData.melonKey];
+      if (mc !== undefined) {
+        melonMeshes3D[key].material.color.setHex(mc);
+        melonMeshes3D[key].material.emissive.setHex(Math.floor(mc * 0.3));
+      }
+    } else if (mVis) {
+      melonMeshes3D[key].material.color.setHex(0xBA7517);
+      melonMeshes3D[key].material.emissive.setHex(0x331100);
+    }
+  }
+
+  // 出口可见性
+  if (exitMesh3D && G.exitGridX >= 0) {
+    var eVis = !!G.explored[G.exitGridX + ',' + G.exitGridY];
+    exitMesh3D.visible = eVis;
+    if (exitMesh3D.userData.beam) exitMesh3D.userData.beam.visible = eVis;
+  }
+
+  // 玩家目标位置
+  if (playerGroup3D) {
+    playerTargetX3D = G.playerX * CELL_3D + CELL_3D/2;
+    playerTargetZ3D = G.playerY * CELL_3D + CELL_3D/2;
+  }
+
+  // 雷达球
+  if (radarSphere3D) {
+    radarSphere3D.visible = G.radarTime > 0;
+    if (radarSphere3D.visible && playerGroup3D) {
+      radarSphere3D.position.copy(playerGroup3D.position);
+    }
+  }
+
+  // 土遁高亮
+  updateTunnelHighlight3D();
+}
+
+function updateTunnelHighlight3D() {
+  for (var i = 0; i < highlightMeshes3D.length; i++) {
+    scene3D.remove(highlightMeshes3D[i]);
+    highlightMeshes3D[i].geometry.dispose();
+    highlightMeshes3D[i].material.dispose();
+  }
+  highlightMeshes3D = [];
+
+  if (!G.tunnelSelected) return;
+
+  var dirs = [[0,-1],[0,1],[-1,0],[1,0]];
+  for (var d = 0; d < dirs.length; d++) {
+    var wx = G.playerX + dirs[d][0], wy = G.playerY + dirs[d][1];
+    if (wx >= 0 && wx < G.cols && wy >= 0 && wy < G.rows && G.grid[wy][wx] === 1) {
+      var geo = new THREE.BoxGeometry(CELL_3D - 0.1, WALL_HEIGHT + 0.3, CELL_3D - 0.1);
+      var mat = new THREE.MeshBasicMaterial({
+        color: 0xFAC775,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.8
+      });
+      var mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(wx * CELL_3D + CELL_3D/2, WALL_HEIGHT/2, wy * CELL_3D + CELL_3D/2);
+      scene3D.add(mesh);
+      highlightMeshes3D.push(mesh);
+    }
+  }
+}
+
+function animate3D() {
+  animFrameId3D = requestAnimationFrame(animate3D);
+  if (!scene3D || !renderer3D) return;
+
+  var t = Date.now() * 0.001;
+
+  // 玩家平滑移动
+  if (playerGroup3D) {
+    playerGroup3D.position.x += (playerTargetX3D - playerGroup3D.position.x) * 0.25;
+    playerGroup3D.position.z += (playerTargetZ3D - playerGroup3D.position.z) * 0.25;
+    // 玩家轻微弹跳
+    playerGroup3D.position.y = Math.abs(Math.sin(t * 5)) * 0.12;
+  }
+
+  // 盲盒浮动+旋转
+  for (var key in melonMeshes3D) {
+    var mesh = melonMeshes3D[key];
+    if (mesh.visible) {
+      mesh.position.y = 1.6 + Math.sin(t * 2 + mesh.userData.phase) * 0.3;
+      mesh.rotation.y += 0.02;
+      mesh.rotation.x = Math.sin(t * 1.5 + mesh.userData.phase) * 0.12;
+    }
+  }
+
+  // 出口传送门脉冲
+  if (exitMesh3D && exitMesh3D.visible) {
+    exitMesh3D.material.opacity = 0.5 + Math.sin(t * 3) * 0.2;
+    exitMesh3D.rotation.y += 0.015;
+    if (exitMesh3D.userData.beam) {
+      exitMesh3D.userData.beam.material.opacity = 0.08 + Math.sin(t * 2) * 0.06;
+      exitMesh3D.userData.beam.rotation.y -= 0.01;
+    }
+  }
+
+  // 雷达球旋转
+  if (radarSphere3D && radarSphere3D.visible) {
+    radarSphere3D.rotation.y += 0.02;
+    radarSphere3D.rotation.x += 0.01;
+  }
+
+  // 庆祝粒子
+  if (celebration.active) updateCelebration3D();
+
+  renderer3D.render(scene3D, camera3D);
+}
+
+// ======================== 3D 通关庆祝 ========================
+function startCelebration3D() {
+  if (!playerGroup3D) return;
+
+  var colors = [0x5DCAA5, 0xFAC775, 0xF0997B, 0xD85A30, 0x97C459, 0xffffff, 0xBA7517];
+  var px = playerGroup3D.position.x;
+  var py = 3;
+  var pz = playerGroup3D.position.z;
+
+  for (var i = 0; i < 80; i++) {
+    var angle = (Math.PI * 2 * i) / 80 + (Math.random() - 0.5) * 0.8;
+    var speed = 0.12 + Math.random() * 0.3;
+
+    var isBox = Math.random() > 0.5;
+    var geo = isBox
+      ? new THREE.BoxGeometry(0.3, 0.2, 0.3)
+      : new THREE.SphereGeometry(0.22, 6, 4);
+    var mat = new THREE.MeshBasicMaterial({
+      color: colors[Math.floor(Math.random() * colors.length)],
+      transparent: true,
+      opacity: 1.0
+    });
+
+    var particle = new THREE.Mesh(geo, mat);
+    particle.position.set(px + (Math.random()-0.5)*2, py, pz + (Math.random()-0.5)*2);
+    particle.userData = {
+      vx: Math.cos(angle) * speed,
+      vy: 0.15 + Math.random() * 0.25,
+      vz: Math.sin(angle) * speed,
+      life: 1.0
+    };
+    scene3D.add(particle);
+    celebrationParticles3D.push(particle);
+  }
+}
+
+function updateCelebration3D() {
+  var elapsed = (Date.now() - celebration.startTime) / 1000;
+
+  for (var i = 0; i < celebrationParticles3D.length; i++) {
+    var p = celebrationParticles3D[i];
+    if (p.userData.life <= 0) continue;
+
+    p.position.x += p.userData.vx;
+    p.position.y += p.userData.vy;
+    p.position.z += p.userData.vz;
+    p.userData.vy -= 0.012;
+    p.userData.vx *= 0.99;
+    p.userData.vz *= 0.99;
+    p.rotation.x += 0.1;
+    p.rotation.y += 0.1;
+
+    p.userData.life = Math.max(0, 1 - elapsed / 2.5);
+    p.material.opacity = p.userData.life;
+    p.scale.setScalar(Math.max(0.01, p.userData.life));
+  }
+}
+
+function cleanupCelebration3D() {
+  for (var i = 0; i < celebrationParticles3D.length; i++) {
+    scene3D.remove(celebrationParticles3D[i]);
+    if (celebrationParticles3D[i].geometry) celebrationParticles3D[i].geometry.dispose();
+    if (celebrationParticles3D[i].material) celebrationParticles3D[i].material.dispose();
+  }
+  celebrationParticles3D = [];
+}
+
+// ======================== 3D 输入 ========================
+function getGridFromMouse3D(clientX, clientY) {
+  if (!renderer3D || !camera3D) return null;
+
+  var rect = renderer3D.domElement.getBoundingClientRect();
+  var x = ((clientX - rect.left) / rect.width) * 2 - 1;
+  var y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+  mouse3D.x = x;
+  mouse3D.y = y;
+  raycaster3D.setFromCamera(mouse3D, camera3D);
+
+  var intersects = raycaster3D.intersectObject(groundPlane3D);
+  if (intersects.length > 0) {
+    var point = intersects[0].point;
+    var gx = Math.floor(point.x / CELL_3D);
+    var gy = Math.floor(point.z / CELL_3D);
+    if (gx >= 0 && gx < G.cols && gy >= 0 && gy < G.rows) {
+      return { x: gx, y: gy };
+    }
+  }
+  return null;
+}
+
+function on3DClick(e) {
+  if (G.paused || celebration.active) return;
+  var grid = getGridFromMouse3D(e.clientX, e.clientY);
+  if (!grid) return;
+
+  if (G.tunnelSelected) {
+    tryTunnel(grid.x, grid.y);
+  } else {
+    var dx = grid.x - G.playerX, dy = grid.y - G.playerY;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      tryMove(dx > 0 ? 1 : -1, 0);
+    } else if (dy !== 0) {
+      tryMove(0, dy > 0 ? 1 : -1);
+    }
+  }
+}
+
+var touchStart3D = null;
+function on3DTouchStart(e) {
+  e.preventDefault();
+  touchStart3D = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}
+
+function on3DTouchEnd(e) {
+  e.preventDefault();
+  if (!touchStart3D || G.paused || celebration.active) return;
+  var touch = e.changedTouches[0];
+  var dx = touch.clientX - touchStart3D.x;
+  var dy = touch.clientY - touchStart3D.y;
+  var threshold = 20;
+
+  if (Math.abs(dx) < threshold && Math.abs(dy) < threshold) {
+    // 轻触 = 点击
+    var grid = getGridFromMouse3D(touch.clientX, touch.clientY);
+    if (grid) {
+      if (G.tunnelSelected) {
+        tryTunnel(grid.x, grid.y);
+      } else {
+        var mdx = grid.x - G.playerX, mdy = grid.y - G.playerY;
+        if (Math.abs(mdx) > Math.abs(mdy)) {
+          tryMove(mdx > 0 ? 1 : -1, 0);
+        } else if (mdy !== 0) {
+          tryMove(0, mdy > 0 ? 1 : -1);
+        }
+      }
+    }
+  } else {
+    // 滑动
+    if (Math.abs(dx) > Math.abs(dy)) {
+      tryMove(dx > 0 ? 1 : -1, 0);
+    } else {
+      tryMove(0, dy > 0 ? 1 : -1);
+    }
+  }
+  touchStart3D = null;
+}
+
+// ======================== 通关庆祝动画 ========================
+var celebration = { active:false, startTime:0 };
+
+function startCelebration() {
+  celebration.active = true;
+  celebration.startTime = Date.now();
+
+  // HTML文字动画
+  var textEl = document.getElementById('celebration-text');
+  textEl.textContent = t('overlayClear');
+  textEl.classList.remove('hidden', 'show');
+  void textEl.offsetWidth;
+  textEl.classList.add('show');
+
+  // 3D粒子礼花
+  startCelebration3D();
+
+  playLevelCompleteSound();
+
+  setTimeout(function() {
+    celebration.active = false;
+    textEl.classList.add('hidden');
+    textEl.classList.remove('show');
+    cleanupCelebration3D();
+    showOverlay();
+  }, 2500);
+}
+
+// ======================== 初始化 ========================
+function init() {
+  G.unlockedLevels = parseInt(localStorage.getItem('eatgua_unlocked') || '1');
+  init3D();
+  updateLangButtons();
+  applyI18n();
+  updateMusicButton();
+  window.addEventListener('resize', function() { resize3D(); });
+}
+
+function renderLevelSelect() {
+  var list = document.getElementById('level-select-list');
+  list.innerHTML = '';
+  for (var i = 0; i < LEVELS.length; i++) {
+    var locked = i >= G.unlockedLevels;
+    var btn = document.createElement('button');
+    btn.className = 'level-btn' + (locked ? ' locked' : '');
+    var lvName = tl(i, 'name');
+    var lvDesc = tl(i, 'desc');
+    btn.innerHTML = '<div><div>' + t('levelPrefix') + (i+1) + t('levelSuffix') + ' \u00B7 ' + lvName + '</div>' +
+      '<div class="level-btn-desc">' + (locked ? t('locked') : lvDesc) + '</div></div>';
+    if (!locked) {
+      btn.onclick = (function(idx){ return function(){ startLevel(idx); }; })(i);
+    }
+    list.appendChild(btn);
+  }
+}
+
+function startLevel(idx) {
+  tryStartBgm();
+  G.levelIdx = idx;
+  var level = LEVELS[idx];
+  G.grid = level.grid.map(function(row){ return row.slice(); });
+  G.cols = G.grid[0].length;
+  G.rows = G.grid.length;
+  G.energy = 12 + idx * 6;
+  G.explored = {};
+  G.melons = {};
+  G.collected = {};
+  G.tunnelSelected = false;
+  G.radarTime = 0;
+  G.startTime = Date.now();
+  G.paused = false;
+  G.exitGridX = -1;
+  G.exitGridY = -1;
+  celebration.active = false;
+  cleanupCelebration3D();
+
+  for (var y = 0; y < G.rows; y++) {
+    for (var x = 0; x < G.cols; x++) {
+      if (G.grid[y][x] === 4) {
+        G.playerX = x; G.playerY = y;
+        G.grid[y][x] = 0;
+      } else if (G.grid[y][x] === 2) {
+        G.melons[x + ',' + y] = randomMelon();
+        G.grid[y][x] = 0;
+      }
+    }
+  }
+
+  updateExplored();
+
+  document.getElementById('entry-screen').classList.add('hidden');
+  document.getElementById('game-wrap').classList.remove('hidden');
+  document.getElementById('lv-display').textContent = t('levelPrefix') + (idx+1) + t('levelSuffix');
+
+  buildMaze3D();
+  updateUI();
+  startGameLoop();
+}
+
+function randomMelon() {
+  var total = 0;
+  for (var i = 0; i < MELON_KEYS.length; i++) total += MELON_BASE[MELON_KEYS[i]].prob;
+  var r = Math.random() * total;
+  var acc = 0;
+  for (var i = 0; i < MELON_KEYS.length; i++) {
+    acc += MELON_BASE[MELON_KEYS[i]].prob;
+    if (r < acc) return MELON_KEYS[i];
+  }
+  return MELON_KEYS[0];
+}
+
+// ======================== 视野 ========================
+function updateExplored() {
+  var radius = G.radarTime > 0 ? 4 : 2;
+  for (var dy = -radius; dy <= radius; dy++) {
+    for (var dx = -radius; dx <= radius; dx++) {
+      var nx = G.playerX + dx, ny = G.playerY + dy;
+      if (nx >= 0 && nx < G.cols && ny >= 0 && ny < G.rows) {
+        if (dx*dx + dy*dy <= radius*radius) {
+          G.explored[nx + ',' + ny] = true;
+        }
+      }
+    }
+  }
+}
+
+// ======================== 移动 ========================
+function tryMove(dx, dy) {
+  if (G.paused) return;
+  var nx = G.playerX + dx, ny = G.playerY + dy;
+  if (nx < 0 || nx >= G.cols || ny < 0 || ny >= G.rows) return;
+
+  if (G.grid[ny][nx] === 1) {
+    showToast(t('toastWall'));
+    return;
+  }
+
+  if (G.energy < 0.5) {
+    showToast(t('toastNoEnergy'));
+    return;
+  }
+
+  G.playerX = nx; G.playerY = ny;
+  G.energy -= 0.5;
+  if (G.energy < 0) G.energy = 0;
+
+  updateExplored();
+
+  var key = nx + ',' + ny;
+  if (G.melons[key]) {
+    eatMelon(G.melons[key], nx, ny);
+    delete G.melons[key];
+  }
+
+  if (G.grid[ny][nx] === 3) {
+    levelComplete();
+    return;
+  }
+
+  updateUI();
+  render();
+}
+
+function eatMelon(melonKey, x, y) {
+  G.collected[melonKey] = true;
+  var base = MELON_BASE[melonKey];
+
+  if (melonKey === 'bitter') {
+    G.radarTime = 5;
+    showMelonPop(melonKey, t('bitterBuff'));
+    setTimeout(function(){ G.radarTime = 0; render(); }, 5000);
+    updateExplored();
+  } else {
+    G.energy += base.energy;
+    var maxE = RANKS[Math.min(G.levelIdx, RANKS.length-1)].maxEnergy;
+    if (G.energy > maxE) G.energy = maxE;
+    showMelonPop(melonKey, t('energyPlus') + base.energy + t('energyUnit'));
+  }
+
+  var collectedCount = Object.keys(G.collected).length;
+  if (collectedCount <= 7 && !localStorage.getItem('eatgua_kc_' + melonKey)) {
+    localStorage.setItem('eatgua_kc_' + melonKey, '1');
+    setTimeout(function(){ showKnowledgeCard(melonKey); }, 800);
+  }
+}
+
+// ======================== 土遁术 ========================
+function toggleTunnel() {
+  if (G.energy < 5) {
+    showToast(t('toastTunnelNoEnergy'));
+    return;
+  }
+  G.tunnelSelected = !G.tunnelSelected;
+  var btn = document.getElementById('skill-tunnel');
+  if (G.tunnelSelected) {
+    btn.classList.add('active');
+    btn.style.background = 'rgba(215,175,23,0.2)';
+    showToast(t('toastTunnelReady'));
+  } else {
+    btn.classList.remove('active');
+    btn.style.background = 'rgba(15,40,20,0.6)';
+  }
+  render();
+}
+
+function tryTunnel(tx, ty) {
+  if (!G.tunnelSelected) return false;
+  var dx = Math.abs(tx - G.playerX);
+  var dy = Math.abs(ty - G.playerY);
+  if (dx + dy !== 1) return false;
+  if (G.grid[ty][tx] !== 1) return false;
+
+  if (G.energy < 5) {
+    showToast(t('toastNoEnergy'));
+    G.tunnelSelected = false;
+    document.getElementById('skill-tunnel').classList.remove('active');
+    document.getElementById('skill-tunnel').style.background = 'rgba(15,40,20,0.6)';
+    return false;
+  }
+
+  G.energy -= 5;
+  G.playerX = tx; G.playerY = ty;
+  G.grid[ty][tx] = 0;
+  G.tunnelSelected = false;
+  document.getElementById('skill-tunnel').classList.remove('active');
+  document.getElementById('skill-tunnel').style.background = 'rgba(15,40,20,0.6)';
+  updateExplored();
+  showToast(t('toastTunnelUsed'));
+
+  var key = tx + ',' + ty;
+  if (G.melons[key]) {
+    eatMelon(G.melons[key], tx, ty);
+    delete G.melons[key];
+  }
+
+  if (G.grid[ty][tx] === 3) {
+    levelComplete();
+    return true;
+  }
+
+  updateUI();
+  render();
+  return true;
+}
+
+// ======================== 渲染（3D场景更新） ========================
+function render() {
+  updateScene3D();
+}
+
+// ======================== 游戏循环 ========================
+function startGameLoop() {
+  if (animFrameId3D) cancelAnimationFrame(animFrameId3D);
+  animate3D();
+}
+
+// ======================== UI更新 ========================
+function updateUI() {
+  var maxE = RANKS[Math.min(G.levelIdx, RANKS.length-1)].maxEnergy;
+  document.getElementById('energy-display').textContent = Math.floor(G.energy) + '/' + maxE;
+  document.getElementById('energy-bar').style.width = (G.energy / maxE * 100) + '%';
+  document.getElementById('rank-display').textContent = tr(G.levelIdx);
+  document.getElementById('melon-count').textContent = Object.keys(G.collected).length + '/7';
+  document.getElementById('skill-tunnel').disabled = G.energy < 5;
+}
+
+// ======================== 通关 ========================
+function levelComplete() {
+  G.paused = true;
+  if (G.levelIdx + 1 >= G.unlockedLevels && G.levelIdx + 1 < LEVELS.length) {
+    G.unlockedLevels = G.levelIdx + 2;
+    localStorage.setItem('eatgua_unlocked', G.unlockedLevels);
+  }
+  startCelebration();
+}
+
+function showOverlay() {
+  var time = Math.floor((Date.now() - G.startTime) / 1000);
+  var collected = Object.keys(G.collected).length;
+  var isLast = G.levelIdx >= LEVELS.length - 1;
+
+  document.getElementById('overlay-title').textContent = t('overlayClear');
+  document.getElementById('overlay-title').style.color = RANKS[Math.min(G.levelIdx, RANKS.length-1)].color;
+  document.getElementById('overlay-desc').innerHTML =
+    t('overlayTime') + '\uFF1A' + time + t('overlayTimeUnit') + '<br>' +
+    t('overlayCollected') + '\uFF1A' + collected + t('overlayCollectedUnit') + '<br>' +
+    t('overlayEnergyLeft') + '\uFF1A' + Math.floor(G.energy);
+
+  var ob = document.getElementById('overlay-btn');
+  if (isLast) {
+    ob.textContent = t('btnBack');
+    ob.style.background = '#1D9E75';
+    ob.onclick = function(){ backToEntry(); };
+  } else {
+    ob.textContent = t('btnNext');
+    ob.style.background = '#1D9E75';
+    ob.onclick = function(){ nextLevel(); };
+  }
+  document.getElementById('overlay').classList.add('show');
+}
+
+function nextLevel() {
+  document.getElementById('overlay').classList.remove('show');
+  startLevel(G.levelIdx + 1);
+}
+
+function restartLevel() {
+  startLevel(G.levelIdx);
+}
+
+function backToEntry() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('game-wrap').classList.add('hidden');
+  document.getElementById('entry-screen').classList.remove('hidden');
+  if (animFrameId3D) cancelAnimationFrame(animFrameId3D);
+  clearMaze3D();
+  renderLevelSelect();
+}
+
+// ======================== 知识卡 ========================
+function showKnowledgeCard(melonKey) {
+  document.getElementById('kc-emoji').textContent = MELON_BASE[melonKey].emoji;
+  document.getElementById('kc-name').textContent = tm(melonKey, 'name');
+  document.getElementById('kc-title').textContent = tm(melonKey, 'title');
+  document.getElementById('kc-intro').textContent = tm(melonKey, 'intro');
+  document.getElementById('kc-facts').textContent = tm(melonKey, 'facts');
+  document.getElementById('kc-modal').classList.add('show');
+  G.paused = true;
+}
+
+function closeKc() {
+  document.getElementById('kc-modal').classList.remove('show');
+  G.paused = false;
+}
+
+// ======================== 开瓜弹出 ========================
+function showMelonPop(melonKey, text) {
+  document.getElementById('pop-emoji').textContent = MELON_BASE[melonKey].emoji;
+  document.getElementById('pop-text').textContent = tm(melonKey, 'name');
+  document.getElementById('pop-text').style.color = melonKey === 'bitter' ? '#97C459' : '#FAC775';
+  document.getElementById('pop-energy').textContent = text;
+  document.getElementById('pop-energy').style.color = melonKey === 'bitter' ? '#97C459' : '#5DCAA5';
+  var pop = document.getElementById('melon-pop');
+  pop.classList.remove('show');
+  void pop.offsetWidth;
+  pop.classList.add('show');
+  setTimeout(function(){ pop.classList.remove('show'); }, 1200);
+}
+
+// ======================== 提示 ========================
+var toastTimer = null;
+function showToast(msg) {
+  var tt = document.getElementById('toast');
+  tt.textContent = msg;
+  tt.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ tt.classList.remove('show'); }, 2000);
+}
+
+// ======================== 键盘输入 ========================
+document.addEventListener('keydown', function(e) {
+  if (document.getElementById('game-wrap').classList.contains('hidden')) return;
+  if (document.getElementById('kc-modal').classList.contains('show')) return;
+  if (document.getElementById('overlay').classList.contains('show')) return;
+  if (celebration.active) return;
+  switch(e.key) {
+    case 'ArrowUp': case 'w': case 'W': tryMove(0,-1); e.preventDefault(); break;
+    case 'ArrowDown': case 's': case 'S': tryMove(0,1); e.preventDefault(); break;
+    case 'ArrowLeft': case 'a': case 'A': tryMove(-1,0); e.preventDefault(); break;
+    case 'ArrowRight': case 'd': case 'D': tryMove(1,0); e.preventDefault(); break;
+    case 't': case 'T': toggleTunnel(); break;
+  }
+});
+
+// ======================== 启动 ========================
+init();
+</script>
+</body>
+</html>
