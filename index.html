@@ -575,6 +575,7 @@ var G = {
   grid: null,
   playerX: 0, playerY: 0,
   energy: 10,
+  initialEnergy: 12,
   explored: {},
   melons: {},
   collected: {},
@@ -1465,6 +1466,7 @@ function startLevel(idx) {
   G.cols = G.grid[0].length;
   G.rows = G.grid.length;
   G.energy = 12 + idx * 6;
+  G.initialEnergy = 12 + idx * 6;
   G.explored = {};
   G.melons = {};
   G.collected = {};
@@ -1660,8 +1662,10 @@ function startGameLoop() {
 // ======================== UI更新 ========================
 function updateUI() {
   var maxE = RANKS[Math.min(G.levelIdx, RANKS.length-1)].maxEnergy;
-  document.getElementById('energy-display').textContent = Math.floor(G.energy) + '/' + maxE;
-  document.getElementById('energy-bar').style.width = (G.energy / maxE * 100) + '%';
+  // 只显示当前能量值，不显示/最大（避免"开局就有消耗"的错觉）
+  document.getElementById('energy-display').textContent = Math.floor(G.energy);
+  // 能量条以初始能量为100%基准，这样开局看起来是满的
+  document.getElementById('energy-bar').style.width = Math.min(100, G.energy / G.initialEnergy * 100) + '%';
   document.getElementById('rank-display').textContent = tr(G.levelIdx);
   document.getElementById('melon-count').textContent = Object.keys(G.collected).length + '/7';
   document.getElementById('skill-tunnel').disabled = G.energy < 5;
@@ -1720,9 +1724,118 @@ function backToEntry() {
   renderLevelSelect();
 }
 
+// ======================== 瓜果图标绘制（Canvas） ========================
+var melonIconCache = {};
+function generateMelonIcon(type, size) {
+  size = size || 48;
+  var cacheKey = type + '_' + size;
+  if (melonIconCache[cacheKey]) return melonIconCache[cacheKey];
+  var canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  var ctx = canvas.getContext('2d');
+  var cx = size / 2, cy = size / 2;
+  switch (type) {
+    case 'winter': // 冬瓜：白色长椭圆，顶部浅绿
+      ctx.fillStyle = '#f0f0e8';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 2, size * 0.28, size * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#e0e0d5';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = '#c8e6c9';
+      ctx.beginPath();
+      ctx.ellipse(cx, size * 0.22, size * 0.18, size * 0.12, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#a5d6a7';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // 小茎
+      ctx.strokeStyle = '#66bb6a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, size * 0.12);
+      ctx.lineTo(cx + 2, size * 0.04);
+      ctx.stroke();
+      break;
+
+    case 'hami': // 哈密瓜：黄色椭圆，带深纹
+      ctx.fillStyle = '#fff8e1';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, size * 0.4, size * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffe082';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // 瓜纹（棕色弧线）
+      ctx.strokeStyle = '#c4956a';
+      ctx.lineWidth = 2;
+      for (var i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(size * 0.12, cy + i * size * 0.1);
+        ctx.quadraticCurveTo(cx, cy + i * size * 0.1 - size * 0.05, size * 0.88, cy + i * size * 0.1);
+        ctx.stroke();
+      }
+      // 竖纹
+      ctx.strokeStyle = '#d4a574';
+      ctx.lineWidth = 1.5;
+      for (var j = -1; j <= 1; j++) {
+        ctx.beginPath();
+        ctx.moveTo(cx + j * size * 0.15, size * 0.18);
+        ctx.quadraticCurveTo(cx + j * size * 0.15 + size * 0.03, cy, cx + j * size * 0.15, size * 0.82);
+        ctx.stroke();
+      }
+      break;
+
+    case 'melon': // 甜瓜：浅绿圆形，带网纹
+      ctx.fillStyle = '#dcedc8';
+      ctx.beginPath();
+      ctx.arc(cx, cy, size * 0.38, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#c5e1a5';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // 网纹
+      ctx.strokeStyle = '#aed581';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(size * 0.15, size * 0.35);
+      ctx.quadraticCurveTo(cx, size * 0.25, size * 0.85, size * 0.35);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(size * 0.2, size * 0.55);
+      ctx.quadraticCurveTo(cx, size * 0.45, size * 0.8, size * 0.55);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(size * 0.15, size * 0.7);
+      ctx.quadraticCurveTo(cx, size * 0.6, size * 0.85, size * 0.7);
+      ctx.stroke();
+      // 小茎
+      ctx.strokeStyle = '#4caf50';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, size * 0.15);
+      ctx.lineTo(cx + 3, size * 0.05);
+      ctx.stroke();
+      break;
+
+    default:
+      return null;
+  }
+  var url = canvas.toDataURL('image/png');
+  melonIconCache[cacheKey] = url;
+  return url;
+}
+
 // ======================== 知识卡 ========================
 function showKnowledgeCard(melonKey) {
-  document.getElementById('kc-emoji').textContent = MELON_BASE[melonKey].emoji;
+  var iconUrl = generateMelonIcon(melonKey, 64);
+  var emojiEl = document.getElementById('kc-emoji');
+  if (iconUrl) {
+    emojiEl.innerHTML = '<img src="' + iconUrl + '" width="64" height="64" style="display:block;margin:0 auto;border-radius:8px;">';
+  } else {
+    emojiEl.textContent = MELON_BASE[melonKey].emoji;
+  }
   document.getElementById('kc-name').textContent = tm(melonKey, 'name');
   document.getElementById('kc-title').textContent = tm(melonKey, 'title');
   document.getElementById('kc-intro').textContent = tm(melonKey, 'intro');
@@ -1738,7 +1851,13 @@ function closeKc() {
 
 // ======================== 开瓜弹出 ========================
 function showMelonPop(melonKey, text) {
-  document.getElementById('pop-emoji').textContent = MELON_BASE[melonKey].emoji;
+  var iconUrl = generateMelonIcon(melonKey, 48);
+  var emojiEl = document.getElementById('pop-emoji');
+  if (iconUrl) {
+    emojiEl.innerHTML = '<img src="' + iconUrl + '" width="48" height="48" style="display:block;margin:0 auto;border-radius:6px;">';
+  } else {
+    emojiEl.textContent = MELON_BASE[melonKey].emoji;
+  }
   document.getElementById('pop-text').textContent = tm(melonKey, 'name');
   document.getElementById('pop-text').style.color = melonKey === 'bitter' ? '#97C459' : '#FAC775';
   document.getElementById('pop-energy').textContent = text;
