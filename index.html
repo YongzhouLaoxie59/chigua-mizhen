@@ -71,17 +71,36 @@ body {
 
 /* 技能栏 */
 #skill-bar {
-  display:flex; gap:8px; width:100%; justify-content:center;
+  display:flex; gap:6px; width:100%; justify-content:center; flex-wrap:wrap;
 }
 .skill-btn {
-  display:flex; flex-direction:column; align-items:center; gap:2px;
-  padding:8px 16px; border-radius:10px; border:2px solid;
+  display:flex; flex-direction:column; align-items:center; gap:1px;
+  padding:6px 10px; border-radius:10px; border:2px solid;
   background:rgba(15,40,20,0.6); cursor:pointer; transition:all 0.2s;
-  font-size:13px; font-weight:700;
+  font-size:12px; font-weight:700; min-width:52px;
 }
 .skill-btn.active { transform:scale(1.05); }
-.skill-cost { font-size:10px; opacity:0.7; }
+.skill-cost { font-size:9px; opacity:0.7; }
 .skill-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.skill-icon { font-size:18px; line-height:1; }
+
+/* 星级评价 */
+.overlay-stars { font-size:28px; margin-bottom:8px; letter-spacing:4px; }
+.star-on { color:#FAC775; }
+.star-off { color:rgba(255,255,255,0.15); }
+
+/* 成就提示 */
+.ach-toast {
+  position:fixed; top:60px; left:50%; transform:translateX(-50%);
+  background:linear-gradient(135deg,#D85A30,#BA7517); color:#fff;
+  padding:8px 20px; border-radius:20px; font-size:13px; font-weight:700;
+  z-index:300; box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  animation:achSlide 0.5s ease;
+}
+@keyframes achSlide { from{opacity:0;transform:translateX(-50%) translateY(-20px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+
+/* 关卡按钮星级 */
+.level-stars { font-size:11px; color:#FAC775; }
 
 /* 控制按钮 */
 #ctrl-bar { display:flex; gap:8px; }
@@ -265,10 +284,35 @@ body {
   <div id="maze-3d"></div>
 
   <div id="skill-bar">
-    <button class="skill-btn" id="skill-tunnel" onclick="toggleTunnel()"
+    <button class="skill-btn" id="skill-tunnel" onclick="toggleSkill('tunnel')"
       style="border-color:rgba(215,175,23,0.4);color:#FAC775;">
+      <span class="skill-icon">&#127956;</span>
       <span id="skill-tunnel-name"></span>
       <span class="skill-cost" id="skill-tunnel-cost"></span>
+    </button>
+    <button class="skill-btn" id="skill-wood" onclick="toggleSkill('wood')"
+      style="border-color:rgba(93,202,165,0.4);color:#5DCAA5;">
+      <span class="skill-icon">&#127807;</span>
+      <span id="skill-wood-name"></span>
+      <span class="skill-cost" id="skill-wood-cost"></span>
+    </button>
+    <button class="skill-btn" id="skill-water" onclick="toggleSkill('water')"
+      style="border-color:rgba(100,149,237,0.4);color:#6495ED;">
+      <span class="skill-icon">&#128167;</span>
+      <span id="skill-water-name"></span>
+      <span class="skill-cost" id="skill-water-cost"></span>
+    </button>
+    <button class="skill-btn" id="skill-metal" onclick="toggleSkill('metal')"
+      style="border-color:rgba(255,215,0,0.4);color:#FFD700;">
+      <span class="skill-icon">&#10024;</span>
+      <span id="skill-metal-name"></span>
+      <span class="skill-cost" id="skill-metal-cost"></span>
+    </button>
+    <button class="skill-btn" id="skill-fire" onclick="toggleSkill('fire')"
+      style="border-color:rgba(255,69,0,0.4);color:#FF4500;">
+      <span class="skill-icon">&#128293;</span>
+      <span id="skill-fire-name"></span>
+      <span class="skill-cost" id="skill-fire-cost"></span>
     </button>
   </div>
 
@@ -281,8 +325,10 @@ body {
 <!-- 通关/失败遮罩 -->
 <div id="overlay">
   <div class="overlay-box">
+    <div class="overlay-stars" id="overlay-stars"></div>
     <div class="overlay-title" id="overlay-title"></div>
     <div class="overlay-desc" id="overlay-desc"></div>
+    <div class="overlay-ach" id="overlay-ach" style="margin-bottom:12px;font-size:13px;color:#FAC775;display:none;"></div>
     <button class="overlay-btn" id="overlay-btn"></button>
   </div>
 </div>
@@ -338,7 +384,18 @@ var I18N = {
     toastTunnelNoEnergy:'能量不足，无法使用土遁术',
     bitterBuff:'苦尽甘来！',
     energyPlus:'+', energyUnit:'能量',
-    exit:'出', musicOn:'音乐开', musicOff:'音乐关'
+    exit:'出', musicOn:'音乐开', musicOff:'音乐关',
+    skillWood:'木遁术', skillWoodCost:'消耗3能量',
+    skillWater:'水遁术', skillWaterCost:'消耗4能量',
+    skillMetal:'金遁术', skillMetalCost:'消耗6能量',
+    skillFire:'火遁术', skillFireCost:'消耗8能量',
+    toastWoodReady:'木遁术已就绪，点击相邻花墙跃过', toastWoodUsed:'木遁跃过！',
+    toastWoodNoEnergy:'能量不足，无法使用木遁术', toastWoodBlocked:'前方无路可跃',
+    toastWaterUsed:'水遁回溯3步！', toastWaterNoEnergy:'能量不足，无法使用水遁术', toastWaterNoHistory:'无步可退',
+    toastMetalUsed:'金遁术！全图透视5秒', toastMetalNoEnergy:'能量不足，无法使用金遁术',
+    toastFireReady:'火遁术已就绪，点击相邻花墙焚烧', toastFireUsed:'火遁焚墙！', toastFireNoEnergy:'能量不足，无法使用火遁术',
+    achNoSkill:'不遁通关', achAllCollect:'全科齐收', achSpeedRun:'速通达人', achFullEnergy:'满能量通关',
+    achUnlocked:'成就解锁', overlayStars:'星级评价', speedThreshold:'60秒内'
   },
   en: {
     title:'Melon Maze', subtitle:'Yuanmingyuan Flower Maze', footer:'Five Elements · Blind Box · Rank Up',
@@ -356,7 +413,18 @@ var I18N = {
     toastTunnelNoEnergy:'Not enough energy for Earth Tunnel',
     bitterBuff:'Sweet after bitter!',
     energyPlus:'+', energyUnit:' energy',
-    exit:'OUT', musicOn:'Music On', musicOff:'Music Off'
+    exit:'OUT', musicOn:'Music On', musicOff:'Music Off',
+    skillWood:'Wood Leap', skillWoodCost:'Cost 3 energy',
+    skillWater:'Water Recall', skillWaterCost:'Cost 4 energy',
+    skillMetal:'Gold Vision', skillMetalCost:'Cost 6 energy',
+    skillFire:'Fire Burn', skillFireCost:'Cost 8 energy',
+    toastWoodReady:'Wood Leap ready. Tap adjacent wall to jump', toastWoodUsed:'Wood leap!',
+    toastWoodNoEnergy:'Not enough energy for Wood Leap', toastWoodBlocked:'No path to leap to',
+    toastWaterUsed:'Water recall! Rewind 3 steps', toastWaterNoEnergy:'Not enough energy for Water Recall', toastWaterNoHistory:'No steps to rewind',
+    toastMetalUsed:'Gold Vision! Full map revealed 5s', toastMetalNoEnergy:'Not enough energy for Gold Vision',
+    toastFireReady:'Fire Burn ready. Tap adjacent wall to burn', toastFireUsed:'Fire burn!', toastFireNoEnergy:'Not enough energy for Fire Burn',
+    achNoSkill:'No Skill Clear', achAllCollect:'All Melons', achSpeedRun:'Speed Runner', achFullEnergy:'Full Energy',
+    achUnlocked:'Achievement Unlocked', overlayStars:'Stars', speedThreshold:'under 60s'
   },
   ja: {
     title:'吃瓜迷陣', subtitle:'円明園万花陣', footer:'五行遁術 · 盲盒吃瓜 · 等級昇進',
@@ -374,7 +442,18 @@ var I18N = {
     toastTunnelNoEnergy:'土遁術のエネルギー不足',
     bitterBuff:'苦尽甘来！',
     energyPlus:'+', energyUnit:'エネルギー',
-    exit:'出', musicOn:'音楽オン', musicOff:'音楽オフ'
+    exit:'出', musicOn:'音楽オン', musicOff:'音楽オフ',
+    skillWood:'木遁術', skillWoodCost:'3エネルギー消費',
+    skillWater:'水遁術', skillWaterCost:'4エネルギー消費',
+    skillMetal:'金遁術', skillMetalCost:'6エネルギー消費',
+    skillFire:'火遁術', skillFireCost:'8エネルギー消費',
+    toastWoodReady:'木遁術発動。隣接する花壁をタップ', toastWoodUsed:'木遁突破！',
+    toastWoodNoEnergy:'木遁術のエネルギー不足', toastWoodBlocked:'飛越え先がない',
+    toastWaterUsed:'水遁回溯！3歩戻る', toastWaterNoEnergy:'水遁術のエネルギー不足', toastWaterNoHistory:'戻る歩がない',
+    toastMetalUsed:'金遁術！全図透視5秒', toastMetalNoEnergy:'金遁術のエネルギー不足',
+    toastFireReady:'火遁術発動。隣接する花壁をタップ', toastFireUsed:'火遁焚壁！', toastFireNoEnergy:'火遁術のエネルギー不足',
+    achNoSkill:'無術クリア', achAllCollect:'全瓜収集', achSpeedRun:'速攻達人', achFullEnergy:'満エネクリア',
+    achUnlocked:'実績解除', overlayStars:'星評価', speedThreshold:'60秒以内'
   },
   ko: {
     title:'과일 미궁', subtitle:'원명원 만화진', footer:'오행둔술 · 블라인드박스 · 등급 승급',
@@ -392,7 +471,18 @@ var I18N = {
     toastTunnelNoEnergy:'토둔술 에너지 부족',
     bitterBuff:'고진감래!',
     energyPlus:'+', energyUnit:' 에너지',
-    exit:'출', musicOn:'음악 켜짐', musicOff:'음악 꺼짐'
+    exit:'출', musicOn:'음악 켜짐', musicOff:'음악 꺼짐',
+    skillWood:'목둔술', skillWoodCost:'3 에너지 소모',
+    skillWater:'수둔술', skillWaterCost:'4 에너지 소모',
+    skillMetal:'금둔술', skillMetalCost:'6 에너지 소모',
+    skillFire:'화둔술', skillFireCost:'8 에너지 소모',
+    toastWoodReady:'목둔술 준비. 인접 꽃벽 탭', toastWoodUsed:'목둔 도약!',
+    toastWoodNoEnergy:'목둔술 에너지 부족', toastWoodBlocked:'도약할 곳 없음',
+    toastWaterUsed:'수둔 회溯! 3보 후퇴', toastWaterNoEnergy:'수둔술 에너지 부족', toastWaterNoHistory:'되돌릴 보 없음',
+    toastMetalUsed:'금둔술! 전체 지도 5초 표시', toastMetalNoEnergy:'금둔술 에너지 부족',
+    toastFireReady:'화둔술 준비. 인접 꽃벽 탭', toastFireUsed:'화둔 소각!', toastFireNoEnergy:'화둔술 에너지 부족',
+    achNoSkill:'무술 클리어', achAllCollect:'전과 수집', achSpeedRun:'속공 달인', achFullEnergy:'풀에너지',
+    achUnlocked:'업적 해금', overlayStars:'별점', speedThreshold:'60초 이내'
   }
 };
 
@@ -579,6 +669,74 @@ var LEVELS = [
       [0,0,0,0,0,1,0,0,0,1,0,0,0,0],
       [0,0,1,0,0,0,0,1,0,0,0,0,0,3]
     ]
+  },
+  {
+    names:{ zh:'百花迷踪', en:'Hundred Flowers', ja:'百花迷走', ko:'백화 미궁' },
+    descs:{ zh:'火遁破壁，木遁跃墙', en:'Fire burns, wood leaps', ja:'火遁破壁、木遁飛越', ko:'화둔 파벽, 목둔 도약' },
+    grid:[
+      [4,0,0,0,1,0,0,2,0,0,0,0,0,1,0,0],
+      [0,1,1,0,1,0,1,1,1,0,1,1,0,1,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,0,1,1,1,1,0,1,1,1,0,1,1,1,0],
+      [0,0,0,1,2,0,0,0,1,0,0,0,0,2,0,0],
+      [0,1,1,1,0,1,0,1,1,0,1,0,1,1,1,0],
+      [0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+      [0,0,0,1,0,0,2,0,0,0,1,0,0,0,0,0],
+      [1,1,0,1,0,1,1,1,1,0,1,1,1,0,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+      [0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0],
+      [0,0,0,2,0,1,0,0,0,1,0,0,0,0,0,0],
+      [0,1,1,1,0,0,0,1,0,1,0,1,1,1,1,0],
+      [0,0,0,0,0,1,0,0,0,1,0,0,0,2,0,0],
+      [0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,3]
+    ]
+  },
+  {
+    names:{ zh:'镜花水月', en:'Mirror Moon', ja:'鏡花水月', ko:'경화수월' },
+    descs:{ zh:'水遁回溯，金遁透视', en:'Water recalls, gold reveals', ja:'水遁回溯、金遁透視', ko:'수둔 회溯, 금둔 투시' },
+    grid:[
+      [4,0,0,1,0,0,0,0,1,0,0,2,0,0,0,1],
+      [0,1,0,1,0,1,1,0,1,0,1,1,1,0,1,0],
+      [0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0],
+      [0,0,1,1,1,1,0,1,1,1,1,0,1,1,1,0],
+      [1,0,0,2,0,0,0,1,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,0,1,1,1,0,1,1,1,1,1,0],
+      [0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0],
+      [0,0,0,0,1,1,1,0,1,1,1,1,1,0,0,0],
+      [0,1,1,0,0,0,1,0,0,0,2,0,0,0,1,0],
+      [0,0,0,0,1,0,0,0,1,0,1,0,1,1,1,0],
+      [1,1,1,0,1,1,1,1,1,0,1,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0],
+      [0,1,1,1,1,1,1,1,1,0,0,0,2,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,0],
+      [0,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,3]
+    ]
+  },
+  {
+    names:{ zh:'万花归一', en:'Final Bloom', ja:'万花帰一', ko:'만화귀일' },
+    descs:{ zh:'五行齐用，终极考验', en:'All five skills, ultimate test', ja:'五行齐用、究極の試練', ko:'오행 전용, 궁극의 시련' },
+    grid:[
+      [4,0,0,0,1,0,0,0,0,1,0,0,2,0,0,0,0,1],
+      [0,1,1,0,1,0,1,1,0,1,0,1,1,1,0,1,0,0],
+      [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1],
+      [1,1,1,0,1,1,0,1,1,1,1,0,1,1,0,1,0,0],
+      [0,0,0,0,1,0,0,0,2,0,0,0,1,0,0,0,0,1],
+      [0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+      [0,0,0,2,0,0,0,1,0,0,0,1,0,0,0,2,0,0],
+      [1,1,0,1,1,1,0,1,0,1,0,1,0,1,1,1,0,1],
+      [0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0],
+      [0,1,1,1,0,1,1,1,1,1,1,1,0,1,0,1,1,0],
+      [0,0,0,1,0,0,0,0,2,0,0,0,0,0,0,0,1,0],
+      [0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0],
+      [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+      [0,0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0],
+      [0,0,1,0,0,1,1,1,1,1,0,0,0,1,1,1,0,3]
+    ]
   }
 ];
 
@@ -587,7 +745,9 @@ var RANKS = [
   { names:{ zh:'吃瓜新手', en:'Melon Rookie', ja:'吃瓜ルーキー', ko:'과일 루키' }, maxEnergy:20, color:'#97C459' },
   { names:{ zh:'吃瓜小咖', en:'Melon Fan',    ja:'吃瓜ファン',   ko:'과일 팬'    }, maxEnergy:30, color:'#5DCAA5' },
   { names:{ zh:'吃瓜达人', en:'Melon Expert', ja:'吃瓜プロ',     ko:'과일 프로'  }, maxEnergy:50, color:'#FAC775' },
-  { names:{ zh:'吃瓜大神', en:'Melon Master', ja:'吃瓜マスター', ko:'과일 마스터'}, maxEnergy:80, color:'#D85A30' }
+  { names:{ zh:'吃瓜大神', en:'Melon Master', ja:'吃瓜マスター', ko:'과일 마스터'}, maxEnergy:80, color:'#D85A30' },
+  { names:{ zh:'吃瓜宗师', en:'Melon Sage',   ja:'吃瓜セイジ',   ko:'과일 세이지'}, maxEnergy:100, color:'#9B59B6' },
+  { names:{ zh:'吃瓜传奇', en:'Melon Legend', ja:'吃瓜レジェンド',ko:'과일 레전드'}, maxEnergy:120, color:'#E74C3C' }
 ];
 
 // ======================== 游戏状态 ========================
@@ -601,6 +761,7 @@ var G = {
   melons: {},
   collected: {},
   tunnelSelected: false,
+  activeSkill: null,
   radarTime: 0,
   cellSize: 40,
   cols: 10, rows: 10,
@@ -608,7 +769,20 @@ var G = {
   paused: false,
   unlockedLevels: 1,
   exitGridX: -1,
-  exitGridY: -1
+  exitGridY: -1,
+  moveHistory: [],
+  skillUsed: false,
+  visionTime: 0,
+  burnedWalls: {}
+};
+
+// 技能配置
+var SKILL_CONFIG = {
+  tunnel: { cost:5,  target:true,  name:'skillTunnel', costKey:'skillTunnelCost' },
+  wood:   { cost:3,  target:true,  name:'skillWood',   costKey:'skillWoodCost' },
+  water:  { cost:4,  target:false, name:'skillWater',  costKey:'skillWaterCost' },
+  metal:  { cost:6,  target:false, name:'skillMetal',  costKey:'skillMetalCost' },
+  fire:   { cost:8,  target:true,  name:'skillFire',   costKey:'skillFireCost' }
 };
 
 // ======================== 多语种函数 ========================
@@ -657,6 +831,14 @@ function applyI18n() {
   document.getElementById('lbl-collected').textContent = t('lblCollected');
   document.getElementById('skill-tunnel-name').textContent = t('skillTunnel');
   document.getElementById('skill-tunnel-cost').textContent = t('skillTunnelCost');
+  document.getElementById('skill-wood-name').textContent = t('skillWood');
+  document.getElementById('skill-wood-cost').textContent = t('skillWoodCost');
+  document.getElementById('skill-water-name').textContent = t('skillWater');
+  document.getElementById('skill-water-cost').textContent = t('skillWaterCost');
+  document.getElementById('skill-metal-name').textContent = t('skillMetal');
+  document.getElementById('skill-metal-cost').textContent = t('skillMetalCost');
+  document.getElementById('skill-fire-name').textContent = t('skillFire');
+  document.getElementById('skill-fire-cost').textContent = t('skillFireCost');
   document.getElementById('btn-restart').textContent = t('btnRestart');
   document.getElementById('btn-back').textContent = t('btnBack');
   document.getElementById('kc-btn').textContent = t('kcContinue');
@@ -1208,23 +1390,49 @@ function updateTunnelHighlight3D() {
   }
   highlightMeshes3D = [];
 
-  if (!G.tunnelSelected) return;
+  if (!G.activeSkill) return;
 
-  var dirs = [[0,-1],[0,1],[-1,0],[1,0]];
-  for (var d = 0; d < dirs.length; d++) {
-    var wx = G.playerX + dirs[d][0], wy = G.playerY + dirs[d][1];
-    if (wx >= 0 && wx < G.cols && wy >= 0 && wy < G.rows && G.grid[wy][wx] === 1) {
-      var geo = new THREE.BoxGeometry(CELL_3D - 0.1, WALL_HEIGHT + 0.3, CELL_3D - 0.1);
-      var mat = new THREE.MeshBasicMaterial({
-        color: 0xFAC775,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.8
-      });
-      var mesh = new THREE.Mesh(geo, mat);
-      mesh.position.set(wx * CELL_3D + CELL_3D/2, WALL_HEIGHT/2, wy * CELL_3D + CELL_3D/2);
-      scene3D.add(mesh);
-      highlightMeshes3D.push(mesh);
+  var skillColors = { tunnel:0xFAC775, wood:0x5DCAA5, fire:0xFF4500 };
+  var highlightColor = skillColors[G.activeSkill] || 0xFAC775;
+
+  if (G.activeSkill === 'tunnel' || G.activeSkill === 'fire') {
+    // 土遁/火遁：高亮相邻花墙
+    var dirs = [[0,-1],[0,1],[-1,0],[1,0]];
+    for (var d = 0; d < dirs.length; d++) {
+      var wx = G.playerX + dirs[d][0], wy = G.playerY + dirs[d][1];
+      if (wx >= 0 && wx < G.cols && wy >= 0 && wy < G.rows && G.grid[wy][wx] === 1) {
+        var geo = new THREE.BoxGeometry(CELL_3D - 0.1, WALL_HEIGHT + 0.3, CELL_3D - 0.1);
+        var mat = new THREE.MeshBasicMaterial({
+          color: highlightColor,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.8
+        });
+        var mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(wx * CELL_3D + CELL_3D/2, WALL_HEIGHT/2, wy * CELL_3D + CELL_3D/2);
+        scene3D.add(mesh);
+        highlightMeshes3D.push(mesh);
+      }
+    }
+  } else if (G.activeSkill === 'wood') {
+    // 木遁：高亮2格外可跳跃位置
+    var jumpDirs = [[0,-2],[0,2],[-2,0],[2,0]];
+    for (var d = 0; d < jumpDirs.length; d++) {
+      var jx = G.playerX + jumpDirs[d][0], jy = G.playerY + jumpDirs[d][1];
+      var midX = G.playerX + jumpDirs[d][0]/2, midY = G.playerY + jumpDirs[d][1]/2;
+      if (jx >= 0 && jx < G.cols && jy >= 0 && jy < G.rows &&
+          G.grid[midY|0][midX|0] === 1 && G.grid[jy][jx] !== 1) {
+        var jgeo = new THREE.BoxGeometry(CELL_3D - 0.1, 0.15, CELL_3D - 0.1);
+        var jmat = new THREE.MeshBasicMaterial({
+          color: highlightColor,
+          transparent: true,
+          opacity: 0.6
+        });
+        var jmesh = new THREE.Mesh(jgeo, jmat);
+        jmesh.position.set(jx * CELL_3D + CELL_3D/2, 0.08, jy * CELL_3D + CELL_3D/2);
+        scene3D.add(jmesh);
+        highlightMeshes3D.push(jmesh);
+      }
     }
   }
 }
@@ -1371,8 +1579,12 @@ function on3DClick(e) {
   var grid = getGridFromMouse3D(e.clientX, e.clientY);
   if (!grid) return;
 
-  if (G.tunnelSelected) {
+  if (G.activeSkill === 'tunnel') {
     tryTunnel(grid.x, grid.y);
+  } else if (G.activeSkill === 'wood') {
+    tryWood(grid.x, grid.y);
+  } else if (G.activeSkill === 'fire') {
+    tryFire(grid.x, grid.y);
   } else {
     var dx = grid.x - G.playerX, dy = grid.y - G.playerY;
     if (Math.abs(dx) > Math.abs(dy)) {
@@ -1401,8 +1613,12 @@ function on3DTouchEnd(e) {
     // 轻触 = 点击
     var grid = getGridFromMouse3D(touch.clientX, touch.clientY);
     if (grid) {
-      if (G.tunnelSelected) {
+      if (G.activeSkill === 'tunnel') {
         tryTunnel(grid.x, grid.y);
+      } else if (G.activeSkill === 'wood') {
+        tryWood(grid.x, grid.y);
+      } else if (G.activeSkill === 'fire') {
+        tryFire(grid.x, grid.y);
       } else {
         var mdx = grid.x - G.playerX, mdy = grid.y - G.playerY;
         if (Math.abs(mdx) > Math.abs(mdy)) {
@@ -1470,7 +1686,12 @@ function renderLevelSelect() {
     btn.className = 'level-btn' + (locked ? ' locked' : '');
     var lvName = tl(i, 'name');
     var lvDesc = tl(i, 'desc');
-    btn.innerHTML = '<div><div>' + t('levelPrefix') + (i+1) + t('levelSuffix') + ' \u00B7 ' + lvName + '</div>' +
+    var starKey = 'eatgua_stars_' + i;
+    var savedStars = parseInt(localStorage.getItem(starKey) || '0');
+    var starStr = '';
+    for (var st = 0; st < 3; st++) starStr += st < savedStars ? '\u2605' : '\u2606';
+    btn.innerHTML = '<div><div>' + t('levelPrefix') + (i+1) + t('levelSuffix') + ' \u00B7 ' + lvName +
+      (savedStars > 0 ? ' <span class="level-stars">' + starStr + '</span>' : '') + '</div>' +
       '<div class="level-btn-desc">' + (locked ? t('locked') : lvDesc) + '</div></div>';
     if (!locked) {
       btn.onclick = (function(idx){ return function(){ startLevel(idx); }; })(i);
@@ -1492,7 +1713,12 @@ function startLevel(idx) {
   G.melons = {};
   G.collected = {};
   G.tunnelSelected = false;
+  G.activeSkill = null;
   G.radarTime = 0;
+  G.visionTime = 0;
+  G.moveHistory = [];
+  G.skillUsed = false;
+  G.burnedWalls = {};
   G.startTime = Date.now();
   G.paused = false;
   G.exitGridX = -1;
@@ -1537,7 +1763,7 @@ function randomMelon() {
 
 // ======================== 视野 ========================
 function updateExplored() {
-  var radius = G.radarTime > 0 ? 4 : 2;
+  var radius = (G.radarTime > 0 || G.visionTime > 0) ? 999 : 2;
   for (var dy = -radius; dy <= radius; dy++) {
     for (var dx = -radius; dx <= radius; dx++) {
       var nx = G.playerX + dx, ny = G.playerY + dy;
@@ -1566,6 +1792,8 @@ function tryMove(dx, dy) {
     return;
   }
 
+  G.moveHistory.push({ x: G.playerX, y: G.playerY, energy: G.energy });
+  if (G.moveHistory.length > 10) G.moveHistory.shift();
   G.playerX = nx; G.playerY = ny;
   G.energy -= 0.5;
   if (G.energy < 0) G.energy = 0;
@@ -1610,60 +1838,171 @@ function eatMelon(melonKey, x, y) {
   }
 }
 
-// ======================== 土遁术 ========================
-function toggleTunnel() {
-  if (G.energy < 5) {
-    showToast(t('toastTunnelNoEnergy'));
+// ======================== 五行遁术 ========================
+function toggleSkill(skill) {
+  var cfg = SKILL_CONFIG[skill];
+  if (!cfg) return;
+  if (G.energy < cfg.cost) {
+    showToast(t('toast' + skill.charAt(0).toUpperCase() + skill.slice(1) + 'NoEnergy'));
     return;
   }
-  G.tunnelSelected = !G.tunnelSelected;
-  var btn = document.getElementById('skill-tunnel');
-  if (G.tunnelSelected) {
-    btn.classList.add('active');
-    btn.style.background = 'rgba(215,175,23,0.2)';
-    showToast(t('toastTunnelReady'));
+
+  // 即时技能（水遁、金遁）直接执行
+  if (!cfg.target) {
+    if (skill === 'water') doWaterRecall();
+    else if (skill === 'metal') doMetalVision();
+    return;
+  }
+
+  // 目标技能（土遁、木遁、火遁）切换选中状态
+  G.skillUsed = true;
+  if (G.activeSkill === skill) {
+    // 取消选中
+    G.activeSkill = null;
+    clearSkillButtons();
   } else {
-    btn.classList.remove('active');
-    btn.style.background = 'rgba(15,40,20,0.6)';
+    G.activeSkill = skill;
+    clearSkillButtons();
+    var btn = document.getElementById('skill-' + skill);
+    btn.classList.add('active');
+    btn.style.background = 'rgba(255,255,255,0.15)';
+    var readyKey = 'toast' + skill.charAt(0).toUpperCase() + skill.slice(1) + 'Ready';
+    showToast(t(readyKey));
   }
   render();
 }
 
+function clearSkillButtons() {
+  var skills = ['tunnel', 'wood', 'fire'];
+  for (var i = 0; i < skills.length; i++) {
+    var btn = document.getElementById('skill-' + skills[i]);
+    if (btn) {
+      btn.classList.remove('active');
+      btn.style.background = 'rgba(15,40,20,0.6)';
+    }
+  }
+}
+
+// 土遁术：穿墙（墙变路径，移动到墙的位置）
 function tryTunnel(tx, ty) {
-  if (!G.tunnelSelected) return false;
+  if (G.activeSkill !== 'tunnel') return false;
   var dx = Math.abs(tx - G.playerX);
   var dy = Math.abs(ty - G.playerY);
   if (dx + dy !== 1) return false;
   if (G.grid[ty][tx] !== 1) return false;
 
-  if (G.energy < 5) {
-    showToast(t('toastNoEnergy'));
-    G.tunnelSelected = false;
-    document.getElementById('skill-tunnel').classList.remove('active');
-    document.getElementById('skill-tunnel').style.background = 'rgba(15,40,20,0.6)';
-    return false;
-  }
-
   G.energy -= 5;
+  G.moveHistory.push({ x: G.playerX, y: G.playerY, energy: G.energy });
+  if (G.moveHistory.length > 10) G.moveHistory.shift();
   G.playerX = tx; G.playerY = ty;
   G.grid[ty][tx] = 0;
-  G.tunnelSelected = false;
-  document.getElementById('skill-tunnel').classList.remove('active');
-  document.getElementById('skill-tunnel').style.background = 'rgba(15,40,20,0.6)';
+  G.activeSkill = null;
+  clearSkillButtons();
   updateExplored();
   showToast(t('toastTunnelUsed'));
 
   var key = tx + ',' + ty;
-  if (G.melons[key]) {
-    eatMelon(G.melons[key], tx, ty);
-    delete G.melons[key];
+  if (G.melons[key]) { eatMelon(G.melons[key], tx, ty); delete G.melons[key]; }
+  if (G.grid[ty][tx] === 3) { levelComplete(); return true; }
+
+  updateUI();
+  render();
+  return true;
+}
+
+// 木遁术：跃过相邻花墙到墙后的格子（墙不变）
+function tryWood(tx, ty) {
+  if (G.activeSkill !== 'wood') return false;
+  var dx = tx - G.playerX;
+  var dy = ty - G.playerY;
+  // 必须是正交方向且距离为2（跳过中间的墙）
+  if (Math.abs(dx) === 2 && dy === 0) {
+    var midX = G.playerX + dx / 2;
+    if (G.grid[G.playerY][midX] !== 1) return false;
+    if (G.grid[ty][tx] === 1) { showToast(t('toastWoodBlocked')); return false; }
+  } else if (Math.abs(dy) === 2 && dx === 0) {
+    var midY = G.playerY + dy / 2;
+    if (G.grid[midY][G.playerX] !== 1) return false;
+    if (G.grid[ty][tx] === 1) { showToast(t('toastWoodBlocked')); return false; }
+  } else {
+    return false;
   }
 
-  if (G.grid[ty][tx] === 3) {
-    levelComplete();
-    return true;
-  }
+  G.energy -= 3;
+  G.moveHistory.push({ x: G.playerX, y: G.playerY, energy: G.energy });
+  if (G.moveHistory.length > 10) G.moveHistory.shift();
+  G.playerX = tx; G.playerY = ty;
+  G.activeSkill = null;
+  clearSkillButtons();
+  updateExplored();
+  showToast(t('toastWoodUsed'));
 
+  var key = tx + ',' + ty;
+  if (G.melons[key]) { eatMelon(G.melons[key], tx, ty); delete G.melons[key]; }
+  if (G.grid[ty][tx] === 3) { levelComplete(); return true; }
+
+  updateUI();
+  render();
+  return true;
+}
+
+// 水遁术：回溯3步
+function doWaterRecall() {
+  if (G.moveHistory.length < 1) {
+    showToast(t('toastWaterNoHistory'));
+    return;
+  }
+  G.energy -= 4;
+  G.skillUsed = true;
+  var steps = Math.min(3, G.moveHistory.length);
+  var target = G.moveHistory[G.moveHistory.length - steps];
+  G.playerX = target.x;
+  G.playerY = target.y;
+  G.energy = Math.min(G.energy + steps * 0.5, RANKS[Math.min(G.levelIdx, RANKS.length - 1)].maxEnergy);
+  G.moveHistory = G.moveHistory.slice(0, G.moveHistory.length - steps);
+  G.activeSkill = null;
+  showToast(t('toastWaterUsed'));
+  updateExplored();
+  updateUI();
+  render();
+}
+
+// 金遁术：全图透视5秒
+function doMetalVision() {
+  G.energy -= 6;
+  G.skillUsed = true;
+  G.visionTime = 5;
+  G.activeSkill = null;
+  // 标记所有格子为已探索
+  for (var y = 0; y < G.rows; y++) {
+    for (var x = 0; x < G.cols; x++) {
+      G.explored[x + ',' + y] = true;
+    }
+  }
+  showToast(t('toastMetalUsed'));
+  updateUI();
+  render();
+  setTimeout(function() {
+    G.visionTime = 0;
+    updateExplored();
+    render();
+  }, 5000);
+}
+
+// 火遁术：烧毁相邻花墙（永久）
+function tryFire(tx, ty) {
+  if (G.activeSkill !== 'fire') return false;
+  var dx = Math.abs(tx - G.playerX);
+  var dy = Math.abs(ty - G.playerY);
+  if (dx + dy !== 1) return false;
+  if (G.grid[ty][tx] !== 1) return false;
+
+  G.energy -= 8;
+  G.grid[ty][tx] = 0;
+  G.burnedWalls[tx + ',' + ty] = true;
+  G.activeSkill = null;
+  clearSkillButtons();
+  showToast(t('toastFireUsed'));
   updateUI();
   render();
   return true;
@@ -1690,6 +2029,10 @@ function updateUI() {
   document.getElementById('rank-display').textContent = tr(G.levelIdx);
   document.getElementById('melon-count').textContent = Object.keys(G.collected).length + '/7';
   document.getElementById('skill-tunnel').disabled = G.energy < 5;
+  document.getElementById('skill-wood').disabled = G.energy < 3;
+  document.getElementById('skill-water').disabled = G.energy < 4 || G.moveHistory.length < 1;
+  document.getElementById('skill-metal').disabled = G.energy < 6;
+  document.getElementById('skill-fire').disabled = G.energy < 8;
 }
 
 // ======================== 通关 ========================
@@ -1707,12 +2050,49 @@ function showOverlay() {
   var collected = Object.keys(G.collected).length;
   var isLast = G.levelIdx >= LEVELS.length - 1;
 
+  // 星级评价
+  var energyRatio = G.energy / G.initialEnergy;
+  var stars = 1;
+  if (energyRatio >= 0.5) stars = 3;
+  else if (energyRatio >= 0.25) stars = 2;
+
+  var starHtml = '';
+  for (var s = 0; s < 3; s++) {
+    starHtml += '<span class="' + (s < stars ? 'star-on' : 'star-off') + '">\u2605</span>';
+  }
+  document.getElementById('overlay-stars').innerHTML = starHtml;
+
+  // 保存星级
+  var starKey = 'eatgua_stars_' + G.levelIdx;
+  var prevStars = parseInt(localStorage.getItem(starKey) || '0');
+  if (stars > prevStars) localStorage.setItem(starKey, stars.toString());
+
   document.getElementById('overlay-title').textContent = t('overlayClear');
   document.getElementById('overlay-title').style.color = RANKS[Math.min(G.levelIdx, RANKS.length-1)].color;
   document.getElementById('overlay-desc').innerHTML =
     t('overlayTime') + '\uFF1A' + time + t('overlayTimeUnit') + '<br>' +
     t('overlayCollected') + '\uFF1A' + collected + t('overlayCollectedUnit') + '<br>' +
     t('overlayEnergyLeft') + '\uFF1A' + Math.floor(G.energy);
+
+  // 成就检查
+  var achievements = [];
+  if (!G.skillUsed) achievements.push(t('achNoSkill'));
+  if (collected >= 7) achievements.push(t('achAllCollect'));
+  if (time <= 60) achievements.push(t('achSpeedRun'));
+  if (energyRatio >= 0.99) achievements.push(t('achFullEnergy'));
+
+  var achEl = document.getElementById('overlay-ach');
+  if (achievements.length > 0) {
+    achEl.style.display = 'block';
+    achEl.innerHTML = '\u2B50 ' + t('achUnlocked') + '\uFF1A' + achievements.join('\u3001');
+    // 保存成就
+    for (var i = 0; i < achievements.length; i++) {
+      var achKey = 'eatgua_ach_' + G.levelIdx + '_' + i;
+      localStorage.setItem(achKey, achievements[i]);
+    }
+  } else {
+    achEl.style.display = 'none';
+  }
 
   var ob = document.getElementById('overlay-btn');
   if (isLast) {
