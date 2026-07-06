@@ -218,6 +218,7 @@ body {
   background-clip:text; letter-spacing:4px;
 }
 .entry-sub { font-size:14px; color:rgba(93,202,165,0.6); letter-spacing:6px; }
+.entry-story { font-size:13px; color:rgba(255,255,255,0.45); text-align:center; max-width:300px; line-height:1.6; font-style:italic; }
 .entry-mask { font-size:56px; animation:bounce 2s ease-in-out infinite; }
 @keyframes bounce { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
 .level-select { display:flex; flex-direction:column; gap:12px; width:100%; max-width:280px; }
@@ -255,6 +256,7 @@ body {
   <div class="entry-mask">&#127816;</div>
   <div class="entry-title" id="entry-title-text">&#21507;&#29916;&#36855;&#38453;</div>
   <div class="entry-sub" id="entry-sub-text"></div>
+  <div class="entry-story" id="entry-story-text"></div>
   <div class="level-select" id="level-select-list"></div>
   <div class="entry-footer" id="entry-footer-text"></div>
 </div>
@@ -369,7 +371,7 @@ body {
 // ======================== 多语种数据 ========================
 var I18N = {
   zh: {
-    title:'吃瓜迷阵', subtitle:'圆明园万花阵', footer:'五行遁术 · 盲盒吃瓜 · 等级晋升',
+    title:'吃瓜迷阵', subtitle:'圆明园万花阵', footer:'五行遁术 · 盲盒吃瓜 · 等级晋升', story:'万花阵中，花开结瓜。寻路觅瓜，五行遁术。',
     levelPrefix:'第', levelSuffix:'关', locked:'未解锁',
     lblLevel:'关卡', lblRank:'称号', lblEnergy:'能量', lblCollected:'收集',
     skillTunnel:'土遁术', skillTunnelCost:'消耗5能量',
@@ -393,12 +395,12 @@ var I18N = {
     toastWoodNoEnergy:'能量不足，无法使用木遁术', toastWoodBlocked:'前方无路可跃',
     toastWaterUsed:'水遁回溯3步！', toastWaterNoEnergy:'能量不足，无法使用水遁术', toastWaterNoHistory:'无步可退',
     toastMetalUsed:'金遁术！全图透视5秒', toastMetalNoEnergy:'能量不足，无法使用金遁术',
-    toastFireReady:'火遁术已就绪，点击相邻花墙焚烧', toastFireUsed:'火遁焚墙！', toastFireNoEnergy:'能量不足，无法使用火遁术',
+    toastFireReady:'火遁术已就绪，点击相邻花墙焰遁穿行', toastFireUsed:'焰遁穿墙！', toastFireNoEnergy:'能量不足，无法使用火遁术',
     achNoSkill:'不遁通关', achAllCollect:'全科齐收', achSpeedRun:'速通达人', achFullEnergy:'满能量通关',
     achUnlocked:'成就解锁', overlayStars:'星级评价', speedThreshold:'60秒内'
   },
   en: {
-    title:'Melon Maze', subtitle:'Yuanmingyuan Flower Maze', footer:'Five Elements · Blind Box · Rank Up',
+    title:'Melon Maze', subtitle:'Yuanmingyuan Flower Maze', footer:'Five Elements · Blind Box · Rank Up', story:'In the Flower Maze, blossoms bear melons. Find your path, master the Five Elements.',
     levelPrefix:'Lv.', levelSuffix:'', locked:'Locked',
     lblLevel:'Level', lblRank:'Title', lblEnergy:'Energy', lblCollected:'Found',
     skillTunnel:'Earth Tunnel', skillTunnelCost:'Cost 5 energy',
@@ -417,17 +419,17 @@ var I18N = {
     skillWood:'Wood Leap', skillWoodCost:'Cost 3 energy',
     skillWater:'Water Recall', skillWaterCost:'Cost 4 energy',
     skillMetal:'Gold Vision', skillMetalCost:'Cost 6 energy',
-    skillFire:'Fire Burn', skillFireCost:'Cost 8 energy',
+    skillFire:'Fire Tunnel', skillFireCost:'Cost 8 energy',
     toastWoodReady:'Wood Leap ready. Tap adjacent wall to jump', toastWoodUsed:'Wood leap!',
     toastWoodNoEnergy:'Not enough energy for Wood Leap', toastWoodBlocked:'No path to leap to',
     toastWaterUsed:'Water recall! Rewind 3 steps', toastWaterNoEnergy:'Not enough energy for Water Recall', toastWaterNoHistory:'No steps to rewind',
     toastMetalUsed:'Gold Vision! Full map revealed 5s', toastMetalNoEnergy:'Not enough energy for Gold Vision',
-    toastFireReady:'Fire Burn ready. Tap adjacent wall to burn', toastFireUsed:'Fire burn!', toastFireNoEnergy:'Not enough energy for Fire Burn',
+    toastFireReady:'Fire Tunnel ready. Tap adjacent wall to phase through', toastFireUsed:'Fire phase through!', toastFireNoEnergy:'Not enough energy for Fire Tunnel',
     achNoSkill:'No Skill Clear', achAllCollect:'All Melons', achSpeedRun:'Speed Runner', achFullEnergy:'Full Energy',
     achUnlocked:'Achievement Unlocked', overlayStars:'Stars', speedThreshold:'under 60s'
   },
   ja: {
-    title:'吃瓜迷陣', subtitle:'円明園万花陣', footer:'五行遁術 · 盲盒吃瓜 · 等級昇進',
+    title:'吃瓜迷陣', subtitle:'円明園万花陣', footer:'五行遁術 · 盲盒吃瓜 · 等級昇進', story:'万花陣中、花は瓜を実らす。道を探り、瓜を求め、五行遁術を極める。',
     levelPrefix:'第', levelSuffix:'関', locked:'未解放',
     lblLevel:'ステージ', lblRank:'称号', lblEnergy:'エネルギー', lblCollected:'収集',
     skillTunnel:'土遁術', skillTunnelCost:'5エネルギー消費',
@@ -451,12 +453,12 @@ var I18N = {
     toastWoodNoEnergy:'木遁術のエネルギー不足', toastWoodBlocked:'飛越え先がない',
     toastWaterUsed:'水遁回溯！3歩戻る', toastWaterNoEnergy:'水遁術のエネルギー不足', toastWaterNoHistory:'戻る歩がない',
     toastMetalUsed:'金遁術！全図透視5秒', toastMetalNoEnergy:'金遁術のエネルギー不足',
-    toastFireReady:'火遁術発動。隣接する花壁をタップ', toastFireUsed:'火遁焚壁！', toastFireNoEnergy:'火遁術のエネルギー不足',
+    toastFireReady:'火遁術発動。隣接する花壁をタップ', toastFireUsed:'火遁穿壁！', toastFireNoEnergy:'火遁術のエネルギー不足',
     achNoSkill:'無術クリア', achAllCollect:'全瓜収集', achSpeedRun:'速攻達人', achFullEnergy:'満エネクリア',
     achUnlocked:'実績解除', overlayStars:'星評価', speedThreshold:'60秒以内'
   },
   ko: {
-    title:'과일 미궁', subtitle:'원명원 만화진', footer:'오행둔술 · 블라인드박스 · 등급 승급',
+    title:'과일 미궁', subtitle:'원명원 만화진', footer:'오행둔술 · 블라인드박스 · 등급 승급', story:'만화진 중, 꽃이 과일을 맺는다. 길을 찾고, 과일을 구하며, 오행둔술을 익히다.',
     levelPrefix:'제', levelSuffix:'관', locked:'잠김',
     lblLevel:'스테이지', lblRank:'칭호', lblEnergy:'에너지', lblCollected:'수집',
     skillTunnel:'토둔술', skillTunnelCost:'5 에너지 소모',
@@ -480,7 +482,7 @@ var I18N = {
     toastWoodNoEnergy:'목둔술 에너지 부족', toastWoodBlocked:'도약할 곳 없음',
     toastWaterUsed:'수둔 회溯! 3보 후퇴', toastWaterNoEnergy:'수둔술 에너지 부족', toastWaterNoHistory:'되돌릴 보 없음',
     toastMetalUsed:'금둔술! 전체 지도 5초 표시', toastMetalNoEnergy:'금둔술 에너지 부족',
-    toastFireReady:'화둔술 준비. 인접 꽃벽 탭', toastFireUsed:'화둔 소각!', toastFireNoEnergy:'화둔술 에너지 부족',
+    toastFireReady:'화둔술 준비. 인접 꽃벽 탭', toastFireUsed:'화둔 통과!', toastFireNoEnergy:'화둔술 에너지 부족',
     achNoSkill:'무술 클리어', achAllCollect:'전과 수집', achSpeedRun:'속공 달인', achFullEnergy:'풀에너지',
     achUnlocked:'업적 해금', overlayStars:'별점', speedThreshold:'60초 이내'
   }
@@ -617,7 +619,7 @@ var MELON_ICONS = {
 // 0=路径 1=花墙 2=盲盒 3=出口 4=起点
 var LEVELS = [
   {
-    names:{ zh:'初入花阵', en:'First Steps', ja:'初陣の花', ko:'첫 걸음' },
+    names:{ zh:'杏花春馆', en:'Apricot Spring', ja:'杏花春館', ko:'살구봄관' },
     descs:{ zh:'万花阵入门，孤岛迷阵', en:'Beginner maze with islands', ja:'入門編、孤島あり', ko:'입문, 섬 미로' },
     grid:[
       [4,0,0,0,1,0,0,0,0,0],
@@ -633,7 +635,7 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'花径通幽', en:'Hidden Path', ja:'花の小径', ko:'꽃길의 오솔길' },
+    names:{ zh:'武陵春色', en:'Wuling Spring', ja:'武陵春色', ko:'무릉추색' },
     descs:{ zh:'岔路增多，土遁寻宝', en:'More forks, tunnel for bonus', ja:'分岐増加、土遁で宝探し', ko:'갈림길 증가, 토둔으로 보물' },
     grid:[
       [4,0,0,1,0,0,0,2,0,0,0,0],
@@ -651,7 +653,7 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'万花深处', en:'Deep in Flowers', ja:'万花の奥', ko:'만화 깊은 곳' },
+    names:{ zh:'万方安和', en:'Harmonious Square', ja:'万方安和', ko:'만방안화' },
     descs:{ zh:'花墙封路，土遁必用', en:'Walls block path, tunnel required', ja:'花壁が道を塞ぐ、土遁必須', ko:'꽃벽이 길 막음, 토둔 필수' },
     grid:[
       [4,0,0,0,1,0,0,2,0,0,0,1,0,0],
@@ -671,8 +673,8 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'百花迷踪', en:'Hundred Flowers', ja:'百花迷走', ko:'백화 미궁' },
-    descs:{ zh:'火遁破壁，木遁跃墙', en:'Fire burns, wood leaps', ja:'火遁破壁、木遁飛越', ko:'화둔 파벽, 목둔 도약' },
+    names:{ zh:'镂月开云', en:'Moonlit Bloom', ja:'鏤月開雲', ko:'루월개운' },
+    descs:{ zh:'火遁穿壁，木遁跃墙', en:'Fire phases, wood leaps', ja:'火遁穿壁、木遁飛越', ko:'화둔 통벽, 목둔 도약' },
     grid:[
       [4,0,0,0,1,0,0,2,0,0,0,0,0,1,0,0],
       [0,1,1,0,1,0,1,1,1,0,1,1,0,1,0,1],
@@ -693,7 +695,7 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'镜花水月', en:'Mirror Moon', ja:'鏡花水月', ko:'경화수월' },
+    names:{ zh:'水木明瑟', en:'Clear Waters', ja:'水木明瑟', ko:'수목명승' },
     descs:{ zh:'水遁回溯，金遁透视', en:'Water recalls, gold reveals', ja:'水遁回溯、金遁透視', ko:'수둔 회溯, 금둔 투시' },
     grid:[
       [4,0,0,1,0,0,0,0,1,0,0,2,0,0,0,1],
@@ -715,7 +717,7 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'万花归一', en:'Final Bloom', ja:'万花帰一', ko:'만화귀일' },
+    names:{ zh:'多稼如云', en:'Bountiful Harvest', ja:'多稼如雲', ko:'다가여운' },
     descs:{ zh:'五行齐用，终极考验', en:'All five skills, ultimate test', ja:'五行齐用、究極の試練', ko:'오행 전용, 궁극의 시련' },
     grid:[
       [4,0,0,0,1,0,0,0,0,1,0,0,2,0,0,0,0,1],
@@ -825,6 +827,7 @@ function applyI18n() {
   document.getElementById('entry-title-text').textContent = t('title');
   document.getElementById('entry-sub-text').textContent = t('subtitle');
   document.getElementById('entry-footer-text').textContent = t('footer');
+  document.getElementById('entry-story-text').textContent = t('story');
   document.getElementById('lbl-level').textContent = t('lblLevel');
   document.getElementById('lbl-rank').textContent = t('lblRank');
   document.getElementById('lbl-energy').textContent = t('lblEnergy');
@@ -1989,7 +1992,7 @@ function doMetalVision() {
   }, 5000);
 }
 
-// 火遁术：烧毁相邻花墙（永久）
+// 火遁术：焰遁穿过相邻花墙（永久开通）
 function tryFire(tx, ty) {
   if (G.activeSkill !== 'fire') return false;
   var dx = Math.abs(tx - G.playerX);
