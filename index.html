@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-<title>吃瓜迷阵 — 圆明园万花阵迷宫探索</title>
+<title>吃瓜迷阵 — 花田瓜阵迷宫探索</title>
 <script src="three.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -371,7 +371,7 @@ body {
 // ======================== 多语种数据 ========================
 var I18N = {
   zh: {
-    title:'吃瓜迷阵', subtitle:'圆明园万花阵', footer:'五大奇功 · 盲盒吃瓜 · 等级晋升', story:'万花阵中，花开结瓜。寻路觅瓜，五大奇功。',
+    title:'吃瓜迷阵', subtitle:'花田瓜阵', footer:'五大奇功 · 盲盒吃瓜 · 等级晋升', story:'花田深处，花开结瓜。五大奇功，寻路觅瓜。',
     levelPrefix:'第', levelSuffix:'关', locked:'未解锁',
     lblLevel:'关卡', lblRank:'称号', lblEnergy:'能量', lblCollected:'收集',
     skillTunnel:'缩骨功', skillTunnelCost:'消耗5能量',
@@ -400,7 +400,7 @@ var I18N = {
     achUnlocked:'成就解锁', overlayStars:'星级评价', speedThreshold:'60秒内'
   },
   en: {
-    title:'Melon Maze', subtitle:'Yuanmingyuan Flower Maze', footer:'Five Arts · Blind Box · Rank Up', story:'In the Flower Maze, blossoms bear melons. Find your path, master the Five Arts.',
+    title:'Melon Maze', subtitle:'Flower Field Melon Maze', footer:'Five Arts · Blind Box · Rank Up', story:'Deep in flower fields, blossoms bear melons. Master the Five Arts, find your way.',
     levelPrefix:'Lv.', levelSuffix:'', locked:'Locked',
     lblLevel:'Level', lblRank:'Title', lblEnergy:'Energy', lblCollected:'Found',
     skillTunnel:'Bone Shrink', skillTunnelCost:'Cost 5 energy',
@@ -429,7 +429,7 @@ var I18N = {
     achUnlocked:'Achievement Unlocked', overlayStars:'Stars', speedThreshold:'under 60s'
   },
   ja: {
-    title:'吃瓜迷陣', subtitle:'円明園万花陣', footer:'五大奇功 · 盲盒吃瓜 · 等級昇進', story:'万花陣中、花は瓜を実らす。道を探り、瓜を求め、五大奇功を極める。',
+    title:'吃瓜迷陣', subtitle:'花田瓜陣', footer:'五大奇功 · 盲盒吃瓜 · 等級昇進', story:'花田深く、花は瓜を実らす。五大奇功、道を探り瓜を求める。',
     levelPrefix:'第', levelSuffix:'関', locked:'未解放',
     lblLevel:'ステージ', lblRank:'称号', lblEnergy:'エネルギー', lblCollected:'収集',
     skillTunnel:'縮骨功', skillTunnelCost:'5エネルギー消費',
@@ -458,7 +458,7 @@ var I18N = {
     achUnlocked:'実績解除', overlayStars:'星評価', speedThreshold:'60秒以内'
   },
   ko: {
-    title:'과일 미궁', subtitle:'원명원 만화진', footer:'오대기공 · 블라인드박스 · 등급 승급', story:'만화진 중, 꽃이 과일을 맺는다. 길을 찾고, 과일을 구하며, 오대기공을 익히다.',
+    title:'과일 미궁', subtitle:'화전과진', footer:'오대기공 · 블라인드박스 · 등급 승급', story:'화전 깊은 곳, 꽃이 과일을 맺는다. 오대기공, 길을 찾아 과일을 구하다.',
     levelPrefix:'제', levelSuffix:'관', locked:'잠김',
     lblLevel:'스테이지', lblRank:'칭호', lblEnergy:'에너지', lblCollected:'수집',
     skillTunnel:'축골공', skillTunnelCost:'5 에너지 소모',
@@ -619,8 +619,8 @@ var MELON_ICONS = {
 // 0=路径 1=花墙 2=盲盒 3=出口 4=起点
 var LEVELS = [
   {
-    names:{ zh:'杏花春馆', en:'Apricot Spring', ja:'杏花春館', ko:'살구봄관' },
-    descs:{ zh:'万花阵入门，孤岛迷阵', en:'Beginner maze with islands', ja:'入門編、孤島あり', ko:'입문, 섬 미로' },
+    names:{ zh:'初入瓜田', en:'Melon Field Entry', ja:'初入瓜田', ko:'초입과전' },
+    descs:{ zh:'初涉瓜田，认识花墙', en:'First steps in melon fields', ja:'瓜田に入る、花壁を知る', ko:'과전 첫걸음, 꽃벽 알기' },
     grid:[
       [4,0,0,0,1,0,0,0,0,0],
       [0,1,1,0,1,0,1,1,1,0],
@@ -635,8 +635,8 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'武陵春色', en:'Wuling Spring', ja:'武陵春色', ko:'무릉추색' },
-    descs:{ zh:'岔路增多，缩骨寻宝', en:'More forks, shrink for bonus', ja:'分岐増加、縮骨で宝探し', ko:'갈림길 증가, 축골로 보물' },
+    names:{ zh:'藤蔓迷踪', en:'Vine Labyrinth', ja:'藤蔓迷踪', ko:'등만미종' },
+    descs:{ zh:'藤蔓交织，缩骨寻宝', en:'Tangled vines, shrink to explore', ja:'藤蔓交錯、縮骨で宝探し', ko:'덩굴 교차, 축골로 보물찾기' },
     grid:[
       [4,0,0,1,0,0,0,2,0,0,0,0],
       [0,1,0,1,0,1,1,1,0,0,1,0],
@@ -653,8 +653,8 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'万方安和', en:'Harmonious Square', ja:'万方安和', ko:'만방안화' },
-    descs:{ zh:'花墙封路，缩骨必用', en:'Walls block path, shrink required', ja:'花壁が道を塞ぐ、縮骨必須', ko:'꽃벽이 길 막음, 축골 필수' },
+    names:{ zh:'花墙探瓜', en:'Wall of Blooms', ja:'花墙探瓜', ko:'화장탐과' },
+    descs:{ zh:'花墙密布，缩骨探瓜', en:'Blooming walls, shrink through', ja:'花壁密集、縮骨で瓜探し', ko:'꽃벽 밀집, 축골로 과일 찾기' },
     grid:[
       [4,0,0,0,1,0,0,2,0,0,0,1,0,0],
       [0,1,1,0,1,0,1,1,1,0,1,1,0,1],
@@ -673,8 +673,8 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'镂月开云', en:'Moonlit Bloom', ja:'鏤月開雲', ko:'루월개운' },
-    descs:{ zh:'点化穿壁，飞檐跃墙', en:'Transform walls, roof leaps', ja:'点化穿壁、飛檐飛越', ko:'점화 통벽, 비첨 도약' },
+    names:{ zh:'金瓜满架', en:'Golden Harvest', ja:'金瓜満架', ko:'금과만가' },
+    descs:{ zh:'瓜熟满架，点化飞檐', en:'Ripe melons, transform and leap', ja:'瓜熟満架、点化飛檐', ko:'과일 익음, 점화 비첨' },
     grid:[
       [4,0,0,0,1,0,0,2,0,0,0,0,0,1,0,0],
       [0,1,1,0,1,0,1,1,1,0,1,1,0,1,0,1],
@@ -695,8 +695,8 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'水木明瑟', en:'Clear Waters', ja:'水木明瑟', ko:'수목명승' },
-    descs:{ zh:'凌波回溯，天眼透视', en:'Wave recalls, heaven eye reveals', ja:'凌波回溯、天眼透視', ko:'능파 회溯, 천안 투시' },
+    names:{ zh:'迷径通幽', en:'Hidden Path', ja:'迷径通幽', ko:'미경통유' },
+    descs:{ zh:'曲径迷踪，凌波天眼', en:'Shrouded paths, wave and eye', ja:'曲径迷踪、凌波天眼', ko:'곡경 미종, 능파 천안' },
     grid:[
       [4,0,0,1,0,0,0,0,1,0,0,2,0,0,0,1],
       [0,1,0,1,0,1,1,0,1,0,1,1,1,0,1,0],
@@ -717,8 +717,8 @@ var LEVELS = [
     ]
   },
   {
-    names:{ zh:'多稼如云', en:'Bountiful Harvest', ja:'多稼如雲', ko:'다가여운' },
-    descs:{ zh:'五行齐用，终极考验', en:'All five skills, ultimate test', ja:'五行齐用、究極の試練', ko:'오행 전용, 궁극의 시련' },
+    names:{ zh:'香飘十里', en:'Fragrant Journey', ja:'香飄十里', ko:'향표십리' },
+    descs:{ zh:'香飘十里，五技齐用', en:'Far fragrance, all five skills', ja:'香り十里、五技齊用', ko:'향기 십리, 오기 전용' },
     grid:[
       [4,0,0,0,1,0,0,0,0,1,0,0,2,0,0,0,0,1],
       [0,1,1,0,1,0,1,1,0,1,0,1,1,1,0,1,0,0],
