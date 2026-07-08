@@ -84,13 +84,13 @@ body {
 
 /* 技能栏 */
 #skill-bar {
-  display:flex; gap:6px; width:100%; justify-content:center; flex-wrap:wrap;
+  display:flex; gap:6px; width:100%; justify-content:center; flex-wrap:nowrap;
 }
 .skill-btn {
-  display:flex; flex-direction:column; align-items:center; gap:1px;
-  padding:6px 10px; border-radius:10px; border:2px solid;
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:1px;
+  padding:6px 4px; border-radius:10px; border:2px solid;
   background:rgba(15,40,20,0.6); cursor:pointer; transition:all 0.2s;
-  font-size:12px; font-weight:700; min-width:52px;
+  font-size:11px; font-weight:700; min-width:0;
 }
 .skill-btn.active { transform:scale(1.05); }
 .skill-cost { font-size:9px; opacity:0.7; }
@@ -445,7 +445,7 @@ var I18N = {
     levelPrefix:'第', levelSuffix:'关', locked:'未解锁',
     selectLevel:'选 关', levelModalTitle:'选择关卡', levelModalClose:'关闭',
     overlayShortest:'看看你是否走了最捷径？',
-    overlayShortestPerfect:'牛！你走的就是最捷径，正好{N}步！',
+    overlayShortestPerfect:'完美！你利用奇功走了捷径，{N}步就通关！',
     overlayShortestResult:'你走了{A}步，最捷径是{S}步，试试能不能更短？',
     lblLevel:'关卡', lblRank:'称号', lblEnergy:'能量', lblCollected:'收集',
     skillTunnel:'缩骨功', skillTunnelCost:'消耗5能量',
@@ -478,7 +478,7 @@ var I18N = {
     levelPrefix:'Lv.', levelSuffix:'', locked:'Locked',
     selectLevel:'SELECT', levelModalTitle:'Select Level', levelModalClose:'Close',
     overlayShortest:'Did you take the shortest path?',
-    overlayShortestPerfect:'Perfect! You found the shortest path, exactly {N} steps!',
+    overlayShortestPerfect:'Perfect! You used the Five Arts to find a shortcut, {N} steps!',
     overlayShortestResult:'You took {A} steps, the shortest is {S}. Try again?',
     lblLevel:'Level', lblRank:'Title', lblEnergy:'Energy', lblCollected:'Found',
     skillTunnel:'Bone Shrink', skillTunnelCost:'Cost 5 energy',
@@ -511,7 +511,7 @@ var I18N = {
     levelPrefix:'第', levelSuffix:'関', locked:'未解放',
     selectLevel:'関 選 択', levelModalTitle:'ステージ選択', levelModalClose:'閉じる',
     overlayShortest:'最短ルートだったかな？',
-    overlayShortestPerfect:'すごい！最短ルートを発見！ちょうど{N}歩！',
+    overlayShortestPerfect:'すごい！五大奇功を駆使して近道を見つけた！{N}歩！',
     overlayShortestResult:'あなたは{A}歩、最短は{S}歩。もっと短くできる？',
     lblLevel:'ステージ', lblRank:'称号', lblEnergy:'エネルギー', lblCollected:'収集',
     skillTunnel:'縮骨功', skillTunnelCost:'5エネルギー消費',
@@ -544,7 +544,7 @@ var I18N = {
     levelPrefix:'제', levelSuffix:'관', locked:'잠김',
     selectLevel:'스테이지 선택', levelModalTitle:'스테이지 선택', levelModalClose:'닫기',
     overlayShortest:'가장 짧은 길을 걸었을까?',
-    overlayShortestPerfect:'대단해요! 가장 짧은 길을 찾았어요! 정확히 {N}걸음!',
+    overlayShortestPerfect:'대단해요! 오대기공으로 지름길을 찾았어요! {N}걸음!',
     overlayShortestResult:'{A}걸음 걸었고, 가장 짧은 길은 {S}걸음. 다시 도전?',
     lblLevel:'스테이지', lblRank:'칭호', lblEnergy:'에너지', lblCollected:'수집',
     skillTunnel:'축골공', skillTunnelCost:'5 에너지 소모',
@@ -2780,8 +2780,8 @@ function drawMinimap() {
   var shEl = document.getElementById('overlay-shortest');
   if (shortestLen > 0 && G.fullPath.length > 0) {
     var actualLen = G.fullPath.length;
-    if (actualLen === shortestLen) {
-      shEl.textContent = t('overlayShortestPerfect').replace('{N}', shortestLen);
+    if (actualLen <= shortestLen) {
+      shEl.textContent = t('overlayShortestPerfect').replace('{N}', actualLen);
       shEl.style.color = 'rgba(93,202,165,0.9)';
     } else {
       shEl.textContent = t('overlayShortestResult').replace('{A}', actualLen).replace('{S}', shortestLen);
