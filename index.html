@@ -470,13 +470,13 @@ var I18N = {
     toastWoodReady:'飞檐功已就绪，点击相邻花墙跃过', toastWoodUsed:'飞檐跃过！',
     toastWoodNoEnergy:'能量不足，无法使用飞檐功', toastWoodBlocked:'前方无路可跃',
     toastWaterUsed:'凌波回溯3步！', toastWaterNoEnergy:'能量不足，无法使用凌波步', toastWaterNoHistory:'无步可退',
-    toastMetalUsed:'天眼通！全图透视4秒', toastMetalNoEnergy:'能量不足，无法使用天眼通',
+    toastMetalUsed:'天眼通！全图透视2秒', toastMetalNoEnergy:'能量不足，无法使用天眼通',
     toastFireReady:'点化功已就绪，点击相邻花墙化墙为径', toastFireUsed:'化墙为径！', toastFireNoEnergy:'能量不足，无法使用点化功',
     achNoSkill:'无术通关', achAllCollect:'全科齐收', achSpeedRun:'速通达人', achFullEnergy:'满能量通关',
     achUnlocked:'成就解锁', overlayStars:'星级评价', speedThreshold:'60秒内'
   },
   en: {
-    title:'Melon Maze', subtitle:'Flower Field Melon Maze', footer:'Five Arts · Blind Box · Rank Up', story:'Deep in flower fields, blossoms bear melons.<br>Master the Five Arts, find your way.',
+    title:'Melon Maze', subtitle:'Flower Field Melon Maze', footer:'Five Arts · Blind Box · Rank Up', story:'Deep in flower fields, blossoms bear melons.<br>Master the Five Arts, seek the path, find the melon.',
     levelPrefix:'Lv.', levelSuffix:'', locked:'Locked',
     selectLevel:'SELECT', levelModalTitle:'Select Level', levelModalClose:'Close',
     overlayShortest:'Did you take the shortest path?',
@@ -505,7 +505,7 @@ var I18N = {
     toastWoodReady:'Roof Walk ready. Tap adjacent wall to jump', toastWoodUsed:'Roof leap!',
     toastWoodNoEnergy:'Not enough energy for Roof Walk', toastWoodBlocked:'No path to leap to',
     toastWaterUsed:'Wave step! Rewind 3 steps', toastWaterNoEnergy:'Not enough energy for Wave Step', toastWaterNoHistory:'No steps to rewind',
-    toastMetalUsed:'Heaven Eye! Full map revealed 4s', toastMetalNoEnergy:'Not enough energy for Heaven Eye',
+    toastMetalUsed:'Heaven Eye! Full map revealed 2s', toastMetalNoEnergy:'Not enough energy for Heaven Eye',
     toastFireReady:'Transform ready. Tap adjacent wall to convert', toastFireUsed:'Wall to path!', toastFireNoEnergy:'Not enough energy for Transform',
     achNoSkill:'No Skill Clear', achAllCollect:'All Melons', achSpeedRun:'Speed Runner', achFullEnergy:'Full Energy',
     achUnlocked:'Achievement Unlocked', overlayStars:'Stars', speedThreshold:'under 60s'
@@ -540,7 +540,7 @@ var I18N = {
     toastWoodReady:'飛檐功発動。隣接する花壁をタップ', toastWoodUsed:'飛檐突破！',
     toastWoodNoEnergy:'飛檐功のエネルギー不足', toastWoodBlocked:'飛越え先がない',
     toastWaterUsed:'凌波回溯！3歩戻る', toastWaterNoEnergy:'凌波歩のエネルギー不足', toastWaterNoHistory:'戻る歩がない',
-    toastMetalUsed:'天眼通！全図透視4秒', toastMetalNoEnergy:'天眼通のエネルギー不足',
+    toastMetalUsed:'天眼通！全図透視2秒', toastMetalNoEnergy:'天眼通のエネルギー不足',
     toastFireReady:'点化功発動。隣接する花壁をタップ', toastFireUsed:'化壁為径！', toastFireNoEnergy:'点化功のエネルギー不足',
     achNoSkill:'無功クリア', achAllCollect:'全瓜収集', achSpeedRun:'速攻達人', achFullEnergy:'満エネクリア',
     achUnlocked:'実績解除', overlayStars:'星評価', speedThreshold:'60秒以内'
@@ -575,7 +575,7 @@ var I18N = {
     toastWoodReady:'비첨공 준비. 인접 꽃벽 탭', toastWoodUsed:'비첨 도약!',
     toastWoodNoEnergy:'비첨공 에너지 부족', toastWoodBlocked:'도약할 곳 없음',
     toastWaterUsed:'능파 회溯! 3보 후퇴', toastWaterNoEnergy:'능파보 에너지 부족', toastWaterNoHistory:'되돌릴 보 없음',
-    toastMetalUsed:'천안통! 전체 지도 4초 표시', toastMetalNoEnergy:'천안통 에너지 부족',
+    toastMetalUsed:'천안통! 전체 지도 2초 표시', toastMetalNoEnergy:'천안통 에너지 부족',
     toastFireReady:'점화공 준비. 인접 꽃벽 탭', toastFireUsed:'벽이 길로!', toastFireNoEnergy:'점화공 에너지 부족',
     achNoSkill:'무술 클리어', achAllCollect:'전과 수집', achSpeedRun:'속공 달인', achFullEnergy:'풀에너지',
     achUnlocked:'업적 해금', overlayStars:'별점', speedThreshold:'60초 이내'
@@ -2862,16 +2862,16 @@ function doWaterRecall() {
   render();
 }
 
-// 天眼通：全图透视4秒（临时 reveal，不永久写入 explored）
+// 天眼通：全图透视2秒（临时 reveal，不永久写入 explored）
 function doMetalVision() {
   G.energy -= 10;
   G.skillUsed = true;
-  G.visionTime = 4;
+  G.visionTime = 2;
   G.activeSkill = null;
   // 保存当前已探索快照，临时全图显示
   G._exploredSnapshot = {};
   for (var k in G.explored) G._exploredSnapshot[k] = true;
-  // 临时标记所有格子为已探索（仅用于 4 秒内的视觉）
+  // 临时标记所有格子为已探索（仅用于 2 秒内的视觉）
   for (var y = 0; y < G.rows; y++) {
     for (var x = 0; x < G.cols; x++) {
       G.explored[x + ',' + y] = true;
@@ -2901,7 +2901,7 @@ function doMetalVision() {
     G._exploredSnapshot = null;
     updateExplored();
     render();
-  }, 4000);
+  }, 2000);
 }
 
 // 点化功：点化花墙化为花径（永久开通）
