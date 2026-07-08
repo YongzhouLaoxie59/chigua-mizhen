@@ -459,6 +459,7 @@ var I18N = {
     toastTunnelReady:'缩骨功已就绪，点击相邻花墙穿越', toastTunnelUsed:'缩骨穿墙！',
     toastTunnelNoEnergy:'能量不足，无法使用缩骨功',
     bitterBuff:'苦尽甘来！',
+    toastUnripe:'生瓜蛋子！扣除3能量',
     energyPlus:'+', energyUnit:'能量',
     exit:'出', musicOn:'音乐开', musicOff:'音乐关',
     skillWood:'飞檐功', skillWoodCost:'消耗3能量',
@@ -492,6 +493,7 @@ var I18N = {
     toastTunnelReady:'Bone Shrink ready. Tap adjacent wall', toastTunnelUsed:'Shrink through!',
     toastTunnelNoEnergy:'Not enough energy for Bone Shrink',
     bitterBuff:'Sweet after bitter!',
+    toastUnripe:'Unripe melon! -3 energy',
     energyPlus:'+', energyUnit:' energy',
     exit:'OUT', musicOn:'Music On', musicOff:'Music Off',
     skillWood:'Roof Walk', skillWoodCost:'Cost 3 energy',
@@ -525,6 +527,7 @@ var I18N = {
     toastTunnelReady:'縮骨功発動。隣接する花壁をタップ', toastTunnelUsed:'縮骨突破！',
     toastTunnelNoEnergy:'縮骨功のエネルギー不足',
     bitterBuff:'苦尽甘来！',
+    toastUnripe:'生瓜蛋子！エネルギー3消費',
     energyPlus:'+', energyUnit:'エネルギー',
     exit:'出', musicOn:'音楽オン', musicOff:'音楽オフ',
     skillWood:'飛檐功', skillWoodCost:'3エネルギー消費',
@@ -558,6 +561,7 @@ var I18N = {
     toastTunnelReady:'축골공 준비. 인접 꽃벽 탭', toastTunnelUsed:'축골 돌파!',
     toastTunnelNoEnergy:'축골공 에너지 부족',
     bitterBuff:'고진감래!',
+    toastUnripe:'생과! 에너지 3 소모',
     energyPlus:'+', energyUnit:' 에너지',
     exit:'출', musicOn:'음악 켜짐', musicOff:'음악 꺼짐',
     skillWood:'비첨공', skillWoodCost:'3 에너지 소모',
@@ -833,19 +837,109 @@ var KNOWLEDGE_CARDS = {
       facts:'월병이라는 단어는 남송 「무림구사(武林舊事)」에 처음 등장했고, 명·청 시대에는 추석 필수품이 되었다. 수박을 제물로 바치는 역사는 더 오래되었는데, 『시경』의 "7월에 과일을 먹다"는 3천 년 전 기록으로 월병보다 2천 년이나 앞선다. "과(瓜)"는 "귀(歸)"와 발음이 비슷해 가족의 단란함을 상징한다.' }
   },
   level_10: {
-    type:'level', emoji:'\u{1F52E}',
-    zh:{ name:'关卡知识', title:'月光迷宫',
-      intro:'古人以月为伴，创造了无数与月亮相关的文化符号。"月光如水"出自唐代诗人张若虚《春江花月夜》"江流宛转绕芳甸，月照花林皆似霰(xiàn)"。月下迷宫不仅是空间上的迷失与寻找，更是中国传统园林"借景"手法的诗意延伸——透过花墙望月，月色穿透枝叶洒落成网。',
-      facts:'敦煌莫高窟第329窟的"乘象入胎"壁画中，佛陀化身为六牙白象进入摩耶夫人梦境，这个穿越时空的概念和游戏的传送门异曲同工——都是跨越障碍的神奇通道。' },
-    en:{ name:'Level Lore', title:'Moonlit Maze',
-      intro:'Ancient Chinese culture is rich with lunar symbolism. "Moonlight like water" comes from Tang poet Zhang Ruoxu\'s "A Moonlit Night on the Spring River." Moonlit mazes aren\'t just about spatial exploration — they echo the Chinese garden design principle of "borrowed scenery," where moonlight filters through flower walls, casting intricate shadow patterns.',
-      facts:'In Cave 329 of the Mogao Grottoes, a mural depicts Buddha entering Queen Maya\'s dream as a white elephant — a magical passage across dimensions. This portal concept parallels the game\'s teleportation mechanics: mysterious gateways that transcend barriers.' },
-    ja:{ name:'ステージ知識', title:'月光迷宮',
-      intro:'古人は月を友とし、数多くの月にまつわる文化を創造しました。「月光如水」は唐代の詩人・張若虚の「春江花月夜」に由来します。月下の迷宮は空間的な迷いと探索だけでなく、中国庭園の「借景」手法の詩的拡張でもあります——花垣越しに月を望めば、月光が枝葉を通り抜けて網目のように降り注ぎます。',
-      facts:'敦煌莫高窟第329窟の「乗象入胎」壁画では、仏陀が六牙の白象となって摩耶夫人の夢に入ります。この時空を超える概念はゲームの転送門と通じるものがあります——いずれも障害を越える不思議な通路なのです。' },
-    ko:{ name:'스테이지 지식', title:'달빛 미로',
-      intro:'옛 사람들은 달을 벗 삼아 수많은 달 관련 문화를 창조했습니다. "달빛이 물과 같다(月光如水)"라는 표현은 당나라 시인 장약허(張若虛)의 「춘강화월야(春江花月夜)」에서 유래합니다. 달빛 아래 미로는 공간적 탐험일 뿐만 아니라 중국 정원 설계 원리인 "차경(借景)"의 시적 확장입니다.',
-      facts:'둔황(敦煌) 막고굴(莫高窟) 제329굴의 "승상입태(乗象入胎)" 벽화에서는 부처가 여섯 개 상아를 가진 흰 코끼리로 변해 마야 부인의 꿈속으로 들어갑니다. 이 시공간을 초월하는 개념은 게임의 전송문과 통하는 바가 있습니다.' }
+    type:'level', emoji:'\u{1F349}',
+    zh:{ name:'选瓜知识', title:'西瓜六招',
+      intro:'挑西瓜有六句口诀——一弹：手指弹瓜，声音浑厚如鼓是熟瓜，清脆如木鱼是生瓜蛋子；二看蒂：瓜蒂翠绿微弯是新鲜，干枯发黄是陈瓜；三看纹：纹路清晰开阔、底色转黄是熟瓜，纹路模糊泛青是生瓜；四看脐：瓜脐小而内凹的皮薄瓤甜，大而外凸的皮厚瓤少；五掂重：同样大小，重的汁多，轻的可能是空心瓜；六看皮：皮面光滑带白霜是好瓜，粗糙发涩的还没熟。六招合用，百发百中。',
+      facts:'日本研究人员用共振频率仪器检测西瓜，发现成熟瓜的共振频率在100-200赫兹，生瓜在300赫兹以上——"弹瓜听声"原来真有科学依据！' },
+    en:{ name:'Melon Tips', title:'Six Tricks for Watermelon',
+      intro:'Six rules for picking watermelons — 1. Tap: flick the melon; a deep drum-like sound means ripe, a sharp wood-block sound means unripe. 2. Stem: green and curled means fresh; dry and yellow means old. 3. Stripes: clear, wide stripes with yellow underside mean ripe; blurry stripes with white-green base mean unripe. 4. Blossom end: small and concave means thin rind and sweet; large and convex means thick rind. 5. Weight: heavier means juicier; lighter may be hollow. 6. Skin: smooth with white frost means ripe; rough and dull means unripe. Use all six for a perfect pick!',
+      facts:'Japanese researchers used resonance frequency instruments to test watermelons — ripe ones resonate at 100-200 Hz, unripe ones above 300 Hz. "Tap and listen" is scientifically proven!' },
+    ja:{ name:'選瓜知識', title:'スイカ六選',
+      intro:'スイカ選びの六カ条——一弾：指ではじく、低い太鼓の音は熟れ、鋭い木魚の音は生瓜蛋子；二茎：へたが緑で曲がっていれば新鮮、枯れて黄色なら古い；三紋：縞模様がはっきり広く底が黄色なら熟れ、ぼんやり青白ければ生瓜；四臍：おへそが小さくへこんでいれば皮薄で甘い、大きく盛り上がっていれば皮厚；五重：同じ大きさなら重い方がジューシー、軽いのは空洞かも；六皮：表面が滑らかで白い粉があれば熟れ、ザラザラならまだ未熟。六招使いこなせば百発百中。',
+      facts:'日本の研究チームが共振周波数でスイカを調査——熟れた瓜は100-200Hz、生瓜は300Hz以上。「弾瓜聴音」には科学的根拠があった！' },
+    ko:{ name:'과일 지식', title:'수박 육선',
+      intro:'수박 고르기 육칙——일탄: 손가락으로 두드리면 둥근 북소리는 잘 익은 것, 날카로운 목탁 소리는 생과; 이줄기: 줄기가 녹색이고 구부러지면 신선, 말려 노랗으면 오래됨; 삼무늬: 줄무늬가 선명하고 넓으며 바닥이 노란색이면 익음, 흐릿하고 푸르스름하면 생과; 사배꼽: 배꼽이 작고 오목하면 껍질 얇고 달고, 크고 볼록하면 껍질 두꺼움; 오무게: 같은 크기면 무거운 것이 즙 많고, 가벼운 것은 속이 비었을 수도; 유피: 표면이 매끄럽고 흰 가루가 있으면 익고, 거칠면 미숙. 육법을 모두 쓰면 백발백중!',
+      facts:'일본 연구진이 공진 주파수 기기로 수박을 검사한 결과, 잘 익은 수박은 100-200Hz, 생수박은 300Hz 이상이었습니다. "두드려 듣기"에는 과학적 근거가 있었습니다!' }
+  },
+  level_11: {
+    type:'level', emoji:'\u{1F952}',
+    zh:{ name:'选瓜知识', title:'黄瓜看刺',
+      intro:'挑黄瓜的诀窍在"刺"。新鲜黄瓜表面密布小刺，用手轻摸有扎手感，刺硬且挺立，说明刚采摘、水分充足；刺软塌、摸着发滑的，已经不新鲜了。再看顶花——花刚谢、花蒂鲜绿的最为鲜嫩。瓜身深绿带白霜的比发黄发蔫的品质好得多。',
+      facts:'黄瓜的刺其实是"毛状体"，含硅质成分，是植物自我保护的"盔甲"。刺越硬说明黄瓜越年轻、细胞活力越强。老黄瓜刺脱落后表面光滑，口感也变柴。' },
+    en:{ name:'Melon Tips', title:'Cucumber Spines',
+      intro:'The secret to picking cucumbers is in the spines. Fresh cucumbers are covered in small prickles that feel sharp to the touch — stiff and upright means just picked and full of water. Soft, slippery spines mean it is no longer fresh. Check the blossom end too — a recently wilted flower with a green stem indicates peak freshness. Dark green skin with white bloom beats yellow and wilted every time.',
+      facts:'Cucumber spines are actually "trichomes" containing silica — the plant\'s natural armor. Stiffer spines mean a younger cucumber with more vibrant cells. Old cucumbers lose their spines, becoming smooth and tough.' },
+    ja:{ name:'選瓜知識', title:'キュウリ看刺',
+      intro:'キュウリ選びのコツは「刺」にある。新鮮なキュウリは表面に小さな刺が密生し、触るとチクチクする。刺が硬く立っていれば収穫したてで水分十分。刺が柔らかく滑っていれば鮮度落ち。花の跡もチェック——花が落ちたばかりでへたが緑なら一番若い。濃い緑で白い粉のあるものが、黄色くしなびたものよりずっと良い。',
+      facts:'キュウリの刺は実は「毛状体」で、ケイ素成分を含む植物の防具。刺が硬いほど若く細胞活力が強い。古いキュウリは刺が脱落して表面が滑らかになり、食感も落ちる。' },
+    ko:{ name:'과일 지식', title:'오이 가시',
+      intro:'오이 고르기 비결은 "가시"에 있다. 신선한 오이는 표면에 작은 가시가 빽빽하고 손으로 만지면 따끔거린다. 가시가 단단하고 서 있으면 방금 딴 것이고 수분이 충분하다. 가시가 무르고 미끄러우면 신선하지 않은 것이다. 꽃 자리도 확인——꽃이 막 지고 꼭지가 녹색이면 가장 신선하다. 짙은 녹색에 흰 가루가 있는 것이 누렇고 시든 것보다 훨씬 좋다.',
+      facts:'오이의 가시는 사실 "모상체"로 규소 성분을 함유한 식물의 갑옷이다. 가시가 단단할수록 어리고 세포 활력이 강하다. 늙은 오이는 가시가 빠져 표면이 매끄러워지고 식감도 떨어진다.' }
+  },
+  level_12: {
+    type:'level', emoji:'\u{1F348}',
+    zh:{ name:'选瓜知识', title:'甜瓜闻香',
+      intro:'甜瓜成熟与否，鼻子比眼睛更准。把瓜脐凑近鼻子闻一闻，成熟甜瓜散发浓郁果香，生瓜几乎无味。再用手指轻按瓜脐，微软有弹性的说明熟透；按不动、硬邦邦的还没熟。瓜身发黄、散发香气的就是好瓜。',
+      facts:'甜瓜成熟时释放乙酸乙酯等酯类芳香物质，这是"闻香识熟"的科学依据。有趣的是，这些香气分子在瓜脐处浓度最高，因为瓜脐是甜瓜呼吸作用最旺盛的部位。' },
+    en:{ name:'Melon Tips', title:'Smell the Melon',
+      intro:'For melons, your nose knows better than your eyes. Hold the blossom end near your nose and sniff — a ripe melon gives off rich fruity fragrance, while an unripe one is nearly odorless. Gently press the blossom end: slight softness with springiness means ripe; rock-hard means unripe. A yellowish skin with aroma is the one to pick.',
+      facts:'Ripe melons release ester compounds like ethyl acetate — the scientific basis for "smelling ripeness." These aroma molecules concentrate at the blossom end, the most metabolically active part of the fruit.' },
+    ja:{ name:'選瓜知識', title:'メロン聞香',
+      intro:'メロンの熟れ具合は目より鼻が勝る。おへそを鼻に近づけて嗅ぐ——熟れたメロンは濃厚な果物の香りを放ち、生瓜はほとんど無臭。指でおへそを軽く押すと、少し柔らかく弾力があれば完熟。硬くて押せないなら未熟。黄色みを帯びて香るものが良い。',
+      facts:'メロンは熟すと酢酸エチルなどのエステル系芳香物質を放出する。これが「聞香識熟」の科学的根拠。面白いことに、これらの香り分子はおへそ部分で最も濃度が高い。おへそはメロンの呼吸作用が最も盛んな部位だからだ。' },
+    ko:{ name:'과일 지식', title:'참외 맡기',
+      intro:'참외의 익음은 눈보다 코가 더 안다. 배꼽을 코에 가까이 대고 맡는다——잘 익은 참외는 농후한 과일 향기를 풍기고, 생과는 거의 냄새가 없다. 손가락으로 배꼽을 가볍게 눌러보면 약간 무르고 탄력이 있으면 잘 익은 것이고, 단단하게 눌리지 않으면 아직 안 익은 것이다. 노란빛을 띠고 향기가 나는 것이 좋은 참외다.',
+      facts:'참외는 익으면 아세트산 에틸 등 에스테르계 방향 물질을 방출한다. 이것이 "맡아서 익음 앎"의 과학적 근거다. 흥미롭게도 이 향기 분자는 배꼽 부분에서 농도가 가장 높다. 배꼽은 참외의 호흡 작용이 가장 왕성한 부위이기 때문이다.' }
+  },
+  level_13: {
+    type:'level', emoji:'\u{1F969}',
+    zh:{ name:'选瓜知识', title:'哈密网纹',
+      intro:'哈密瓜的网纹是品质的"密码"。网纹密集、纹路深且粗，摸上去有明显凹凸感，说明生长期间温差大、糖分积累充分，口感甜脆；网纹稀疏浅淡、甚至光滑无纹的，多半甜度不够。再闻瓜脐，有浓郁奶香味的最佳。',
+      facts:'哈密瓜的网纹是果皮快速膨大时表皮细胞破裂、愈合后形成的"疤痕"。温差越大，膨大越快，网纹越密——所以新疆哈密瓜的网纹格外漂亮，因为昼夜温差可达20度以上！' },
+    en:{ name:'Melon Tips', title:'Hami Net Pattern',
+      intro:'The net pattern on a Hami melon is the "code" of quality. Dense, deep, thick netting with obvious texture means large temperature differences during growth and full sugar accumulation — sweet and crisp. Sparse, faint, or smooth skin usually means lower sweetness. Sniff the blossom end for a rich creamy aroma — that is the best one.',
+      facts:'The net pattern forms when the rind expands rapidly, cracking and healing into "scars." Bigger temperature swings mean faster expansion and denser netting — which is why Xinjiang Hami melons have the most beautiful patterns, with day-night temperature differences exceeding 20 degrees!' },
+    ja:{ name:'選瓜知識', title:'ハミ網紋',
+      intro:'ハミウリの網紋は品質の「暗号」。網紋が密で深く太く、触って明らかな凹凸があれば、生育中の温度差が大きく糖分が十分に蓄積し、甘くてシャキシャキ。網紋が疎で薄く、滑らかなら甘味不足。おへそを嗅いで濃厚なミルク香があれば最高。',
+      facts:'ハミウリの網紋は果皮が急速に膨大する際、表皮細胞が裂けて癒合してできた「傷跡」。温度差が大きいほど膨大が速く網紋が密になる——だから新疆ハミウリの網紋は格別に美しい。昼夜の温度差が20度以上にもなるからだ！' },
+    ko:{ name:'과일 지식', title:'하미 망문',
+      intro:'하미과의 망문은 품질의 "암호"이다. 망문이 빽빽하고 깊고 굵으며, 만졌을 때 뚜렷한 요철이 있으면 생장 기간 온도차가 크고 당분이 충분히 축적되어 달고 아삭하다. 망문이 성기고 얕거나 매끄러우면 대개 당도가 부족하다. 배꼽을 맡아 진한 크림 향이 나면 최고다.',
+      facts:'하미과의 망문은 과피가 빠르게 팽창할 때 표피 세포가 갈라졌다가 아물어 형성된 "흉터"다. 온도차가 클수록 팽창이 빠르고 망문이 조밀해진다——그래서 신장 하미과의 망문이 유독 아름답다. 일교차가 20도 이상이기 때문이다!' }
+  },
+  level_14: {
+    type:'level', emoji:'\u{1F95B}',
+    zh:{ name:'选瓜知识', title:'冬瓜白霜',
+      intro:'冬瓜表面那层白霜是判断新鲜度的关键。白霜厚而均匀、用手轻擦不易掉，说明冬瓜刚采摘不久、保存完好；白霜稀薄发黄甚至斑驳脱落，说明存放太久。再掂重量，同样大小越重水分越足。切开后果肉白绿致密的口感最佳。',
+      facts:'冬瓜的白霜是果实成熟时表皮分泌的蜡质层，作用是锁住水分、防止微生物侵入——相当于冬瓜自带的"保鲜膜"。白霜完好的冬瓜，自然存放数月也不会坏。' },
+    en:{ name:'Melon Tips', title:'Winter Melon Frost',
+      intro:'The white frost on a winter melon is the key to freshness. Thick, even frost that resists light wiping means just harvested and well-preserved. Thin, yellowish, or patchy frost means it has been stored too long. Weigh it too — heavier means more water for the same size. When cut, dense white-green flesh is the best texture.',
+      facts:'The frost is a waxy layer secreted by the rind at maturity, locking in moisture and blocking microbes — the winter melon\'s built-in "cling film." A fully frosted winter melon can keep for months without spoiling.' },
+    ja:{ name:'選瓜知識', title:'冬瓜白霜',
+      intro:'冬瓜の表面の白い霜は鮮度を見極める鍵。霜が厚く均一で軽く拭いても落ちにくければ、収穫したてで保存状態良好。霜が薄く黄色っぽい、または斑状に剥げているなら長期保管されている。重さも量る——同じ大きさなら重いほど水分十分。切った後、果肉が白緑で緻密なものが最佳。',
+      facts:'冬瓜の白霜は果実が成熟した際に表皮が分泌するワックス層で、水分を閉じ込め微生物の侵入を防ぐ——冬瓜自前の「ラップ」である。白霜が無傷の冬瓜は自然のまま数ヶ月保存しても腐らない。' },
+    ko:{ name:'과일 지식', title:'동백 서리',
+      intro:'동과 표면의 흰 서리는 신선도를 판단하는 핵심이다. 서리가 두껍고 고르며 가볍게 닦아도 잘 벗겨지지 않으면 방금 수확하여 보존 상태가 좋은 것이다. 서리가 얇고 누렇거나 얼룩덜룩 벗겨지면 오래 보관된 것이다. 무게도 재본다——같은 크기면 무거울수록 수분이 충분하다. 자른 후 과육이 백녹색이고 치밀하면 최상이다.',
+      facts:'동과의 흰 서리는 과실이 성숙할 때 과피가 분비하는 왁스 층으로, 수분을 잡아두고 미생물 침입을 막는 동과 자체의 "랩"이다. 서리가 온전한 동과는 자연 상태로 수개월 보관해도 상하지 않는다.' }
+  },
+  pick_pumpkin: {
+    type:'level', emoji:'\u{1F383}',
+    zh:{ name:'选瓜知识', title:'南瓜按皮',
+      intro:'南瓜越老越甜。用指甲轻掐瓜皮，掐不动、硬邦邦的说明完全成熟，淀粉已转化为糖分，口感粉糯香甜；轻松掐入的还不成熟，口感水淡。再看颜色，深黄或橙红的比青绿的老熟；瓜蒂干燥发枯的比鲜绿的在藤上长的时间更长。',
+      facts:'嫩南瓜水分多、口感脆，适合清炒；老南瓜淀粉和胡萝卜素含量高，口感粉糯，适合蒸食煮粥。一个诀窍：同样大小，老南瓜比嫩南瓜轻，因为水分在成熟过程中逐渐减少。' },
+    en:{ name:'Melon Tips', title:'Press the Pumpkin',
+      intro:'The older the pumpkin, the sweeter. Press the skin with a fingernail — if it does not give at all, the pumpkin is fully ripe, starch converted to sugar, giving a dense, sweet texture. If it dents easily, it is still immature and watery. Color matters too: deep yellow or orange-red beats green for ripeness. A dry, withered stem means it spent longer on the vine.',
+      facts:'Young pumpkins have more water and a crisp texture — best for stir-frying. Old pumpkins are richer in starch and beta-carotene, with a dense, fluffy texture — best for steaming or porridge. Tip: for the same size, older pumpkins are lighter, because water decreases as they mature.' },
+    ja:{ name:'選瓜知識', title:'南瓜按皮',
+      intro:'カボチャは古いほど甘い。爪で皮を軽く掐す——掐せない、硬い場合は完全に成熟し、デンプンが糖分に転化してホクホク甘い。簡単に掐めるなら未成熟で水っぽい。色も重要：濃い黄や橙赤は青緑より成熟。へたが乾いて枯れている方が、緑色のものより蔓で長く育った証拠。',
+      facts:'若いカボチャは水分多くシャキシャキで炒め物に適し、古いカボチャはデンプンとカロテンが豊富でホクホク、蒸し物やお粥に適する。コツ：同じ大きさなら古い方が軽い。成熟過程で水分が減るからだ。' },
+    ko:{ name:'과일 지식', title:'호박 누르기',
+      intro:'호박은 오래될수록 달다. 손톱으로 껍질을 가볍게 눌러본다— 전혀 들어가지 않고 단단하면 완전히 익어 전분이 당분으로 전환되어 포슬포슬하고 달다. 쉽게 눌리면 미숙하고 물 맛이다. 색도 중요: 짙은 노랑이나 주홍색이 청록색보다 익은 것이다. 꼭지가 마르고 시들면 넝쿨에서 더 오래 자란 것이다.',
+      facts:'어린 호박은 수분이 많고 아삭해서 볶음에 적합하고, 늙은 호박은 전분과 카로틴이 풍부해 포슬포슬하여 찜이나 죽에 적합하다. 팁: 같은 크기면 늙은 호박이 가볍다. 성숙 과정에서 수분이 줄기 때문이다.' }
+  },
+  pick_bitter: {
+    type:'level', emoji:'\u{1FAD2}',
+    zh:{ name:'选瓜知识', title:'苦瓜观色',
+      intro:'苦瓜要挑嫩的。看颜色，翠绿或偏白的嫩，发黄变橙的已经老了。再看表面瘤粒，颗粒大而饱满、间距宽的肉质厚；颗粒细密、条纹模糊的品质较差。瓜身硬挺、不软塌的新鲜度最好。',
+      facts:'苦瓜变黄变橙是成熟过度的表现——此时果肉变软，苦味降低，但籽外层的红色假种皮变甜。在东南亚，熟透的黄苦瓜籽被当作天然甜品食用。所以"苦瓜不苦"不一定因为品种好，也可能是熟过头了！' },
+    en:{ name:'Melon Tips', title:'Check Bitter Melon Color',
+      intro:'Pick bitter melons young. Look at the color — bright green or pale white is tender; yellow-orange means overripe. Check the surface bumps: large, plump, widely spaced bumps mean thick flesh; fine, blurry bumps mean lower quality. A firm, non-squishy body is freshest.',
+      facts:'Bitter melon turning yellow-orange signals overripeness — the flesh softens, bitterness decreases, but the red aril around the seeds turns sweet. In Southeast Asia, the seeds of fully ripe yellow bitter melons are eaten as a natural sweet. So "bitter melon that isn\'t bitter" might just be overripe!' },
+    ja:{ name:'選瓜知識', title:'苦瓜観色',
+      intro:'ゴーヤは若いものを選ぶ。色を見る——鮮やかな緑や白っぽいものが若く、黄色や橙に変わったものは古い。表面の瘤もチェック——粒が大きくふっくらして間隔が広いものは肉厚。粒が細かく縞がぼやけたものは品質劣る。身が硬くしっかりして、柔らかく崩れないものが新鮮。',
+      facts:'ゴーヤが黄色や橙に変わるのは熟れすぎのサイン——果肉が柔らかくなり苦味は減るが、種の周りの赤い仮種皮が甘くなる。東南アジアでは熟れた黄色ゴーヤの種を天然の甘味として食べる。「ゴーヤが苦くない」のは品種が良いからではなく、熟れすぎかもしれない！' },
+    ko:{ name:'과일 지식', title:'여주 색 보기',
+      intro:'여주는 어린 것을 고른다. 색을 본다— 선명한 녹색이나 흰빛이 어리고, 누렇게 변하면 늙은 것이다. 표면 혹도 확인— 알이 크고 통통하며 간격이 넓으면 과육이 두껍다. 알이 가늘고 무늬가 흐리면 품질이 떨어진다. 몸이 단단하고 무르지 않은 것이 가장 신선하다.',
+      facts:'여주가 노랗게 변하는 것은 과숙의 신호— 과육이 물러지고 쓴맛은 줄지만, 씨 주변의 붉은 가종피가 달아진다. 동남아시아에서는 완전히 익은 노란 여주의 씨를 천연 단맛으로 먹는다. "여주가 안 쓰다"는 품종이 좋아서가 아니라 과숙일 수도 있다!' }
   },
   skill_tunnel: {
     type:'skill', emoji:'\u{1F9CD}',
@@ -946,7 +1040,7 @@ var MELON_ICONS = {
 };
 
 // ======================== 关卡数据 ========================
-// 0=路径 1=花墙 2=盲盒 3=出口 4=起点
+// 0=路径 1=花墙 2=盲盒 3=出口 4=起点 5=传送门 6=生瓜蛋子
 var LEVELS = [
   {
     names:{ zh:'初入瓜田', en:'Melon Field Entry', ja:'初入瓜田', ko:'초입과전' },
@@ -961,14 +1055,14 @@ var LEVELS = [
       [0,2,0,0,0,0,0,0,0,0],
       [0,0,1,1,1,1,1,0,1,0],
       [0,0,0,2,0,0,0,0,0,0],
-      [0,1,1,1,1,1,1,1,0,3]
+      [3,1,1,1,1,1,1,1,0,0]
     ]
   },
   {
     names:{ zh:'藤蔓迷踪', en:'Vine Labyrinth', ja:'藤蔓迷踪', ko:'등만미종' },
     descs:{ zh:'藤蔓交织，缩骨寻宝', en:'Tangled vines, shrink to explore', ja:'藤蔓交錯、縮骨で宝探し', ko:'덩굴 교차, 축골로 보물찾기' },
     grid:[
-      [4,0,0,1,0,0,0,2,0,0,0,0],
+      [4,0,0,1,0,0,0,2,0,0,0,3],
       [0,1,0,1,0,1,1,1,0,0,1,0],
       [0,1,0,0,0,1,0,0,0,1,1,0],
       [0,0,1,1,1,1,0,1,1,0,1,0],
@@ -979,14 +1073,14 @@ var LEVELS = [
       [0,1,0,0,0,1,0,0,1,1,1,0],
       [0,1,1,1,0,0,0,1,2,0,0,0],
       [0,0,0,0,0,1,1,1,0,0,1,0],
-      [0,1,1,1,0,0,0,0,0,1,0,3]
+      [0,1,1,1,0,0,0,0,0,1,0,0]
     ]
   },
   {
     names:{ zh:'花墙探瓜', en:'Wall of Blooms', ja:'花墙探瓜', ko:'화장탐과' },
     descs:{ zh:'花墙密布，缩骨探瓜', en:'Blooming walls, shrink through', ja:'花壁密集、縮骨で瓜探し', ko:'꽃벽 밀집, 축골로 과일 찾기' },
     grid:[
-      [0,0,0,0,1,0,0,2,0,0,0,1,0,3],
+      [0,0,0,0,1,0,0,2,0,0,0,1,0,0],
       [0,1,1,0,1,0,1,1,1,0,1,1,0,1],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [1,1,0,1,1,1,1,0,1,1,1,0,1,0],
@@ -999,7 +1093,7 @@ var LEVELS = [
       [0,0,0,0,0,1,0,0,0,0,0,0,0,2],
       [0,1,1,0,1,1,1,0,1,1,1,0,1,0],
       [0,0,0,0,0,1,0,0,0,1,0,0,0,0],
-      [4,0,1,0,0,0,0,1,0,0,0,0,0,0]
+      [4,0,1,0,0,0,0,1,0,0,0,0,0,3]
     ]
   },
   {
@@ -1043,7 +1137,7 @@ var LEVELS = [
       [0,1,1,1,1,1,1,1,1,0,0,0,2,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,0],
       [0,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0],
-      [3,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0]
+      [0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,3]
     ]
   },
   {
@@ -1067,7 +1161,7 @@ var LEVELS = [
       [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
       [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
       [0,0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0],
-      [0,0,1,0,0,1,1,1,1,1,0,0,0,1,1,1,0,3]
+      [3,0,1,0,0,1,1,1,1,1,0,0,0,1,1,1,0,0]
     ]
   },
 
@@ -1075,7 +1169,7 @@ var LEVELS = [
     names:{ zh:'秋瓜满园', en:'Autumn Harvest', ja:'秋瓜満園', ko:'추과만원' },
     descs:{ zh:'秋风送爽，瓜果飘香', en:'Autumn breeze, melon fragrance', ja:'秋風爽やか、瓜果薫る', ko:'가을 바람, 과일 향기' },
     grid:[
-      [0,0,0,1,0,0,2,0,0,0,1,0,0,0,0,1,0,3],
+      [0,0,0,1,0,0,2,0,0,0,1,0,0,0,0,1,0,0],
       [0,1,0,1,0,1,1,1,0,1,0,1,1,1,0,0,0,1],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0],
       [0,1,1,1,0,1,1,0,1,1,1,0,0,0,0,0,1,0],
@@ -1092,7 +1186,7 @@ var LEVELS = [
       [0,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0,1,0],
       [0,0,0,0,2,0,0,0,1,0,0,0,1,1,1,0,0,0],
       [0,1,1,1,1,0,1,1,1,0,1,1,1,0,0,0,1,0],
-      [4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0]
+      [4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,3]
     ]
   },
   {
@@ -1123,7 +1217,7 @@ var LEVELS = [
     names:{ zh:'卧虎藏瓜', en:'Hidden Gems', ja:'臥虎蔵瓜', ko:'와호장과' },
     descs:{ zh:'深藏不露，卧虎藏瓜', en:'Hidden treasures await', ja:'深く潜み、秘瓜眠る', ko:'깊이 숨은 보물을 찾아라' },
     grid:[
-      [0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0,3],
+      [0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0,0],
       [0,1,1,0,1,0,1,0,1,0,1,0,1,0,0,1,0,1,0,0],
       [0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,1,0,0,0,1],
       [0,1,0,1,1,1,1,1,1,0,1,1,1,0,0,0,0,1,0,0],
@@ -1142,7 +1236,7 @@ var LEVELS = [
       [0,0,2,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
       [0,1,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,1,0,1],
       [0,0,0,0,0,2,0,0,0,1,0,0,0,0,1,0,0,0,0,0],
-      [4,0,1,1,1,1,0,1,1,1,0,1,1,0,1,1,1,1,0,0]
+      [4,0,1,1,1,1,0,1,1,1,0,1,1,0,1,1,1,1,0,3]
     ]
   },
   {
@@ -1169,6 +1263,132 @@ var LEVELS = [
       [0,1,1,1,0,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1],
       [0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0],
       [0,0,1,1,1,1,0,1,1,1,0,1,0,1,1,0,1,1,0,4]
+    ]
+  },
+  {
+    names:{ zh:'瓜田试眼', en:'Melon Eye Test', ja:'瓜田試眼', ko:'과전시안' },
+    descs:{ zh:'初识生瓜，眼明脚快', en:'Meet raw melons, sharp eyes', ja:'生瓜初見、目利き足速く', ko:'생과 첫 만남, 눈 밝게' },
+    grid:[
+      [4,0,0,0,1,0,0,0,2,0,0,0,1,0,0,0,0,0],
+      [0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0],
+      [0,0,0,6,0,2,0,0,0,0,0,0,6,0,0,0,0,0],
+      [1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0],
+      [0,0,0,2,0,0,0,0,0,6,0,0,0,0,2,0,0,3],
+      [1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,0],
+      [0,0,0,6,0,0,0,0,2,0,0,0,6,0,0,0,0,0],
+      [1,1,0,1,1,1,1,0,1,1,1,1,1,1,0,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0],
+      [0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0]
+    ]
+  },
+  {
+    names:{ zh:'瓜香引路', en:'Fragrance Guide', ja:'瓜香導き', ko:'과향인로' },
+    descs:{ zh:'瓜香四溢，辨识生熟', en:'Fragrance everywhere, tell ripe from raw', ja:'瓜香漂う、生熟見分け', ko:'향기 가득, 생과 익과 구분' },
+    grid:[
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4],
+      [0,1,1,1,6,1,1,0,1,1,6,1,1,0,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1],
+      [0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,0,1,1,1,1,1,6,1,1,1,1,0],
+      [0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0],
+      [0,0,0,0,0,0,0,2,0,0,0,0,0,0,2,0,0,0],
+      [0,1,1,1,1,1,0,1,1,1,6,1,1,1,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,0],
+      [0,0,0,0,0,6,0,0,2,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,0,1,1,1,1,6,1,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0],
+      [0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [3,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0]
+    ]
+  },
+  {
+    names:{ zh:'蜜网天成', en:'Natural Net', ja:'蜜網天成', ko:'밀망천성' },
+    descs:{ zh:'网纹天成，传送生瓜', en:'Natural net pattern, portal past raw melons', ja:'網目天成、転送で生瓜越え', ko:'자연 그물무늬, 포털로 생과 넘기' },
+    grid:[
+      [0,0,0,1,0,0,0,0,0,2,3,0,0,1,0,0,0,0,0,0],
+      [0,1,0,1,0,1,1,1,0,1,1,1,0,1,0,1,1,1,6,0],
+      [5,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,1,1,1,1,6,1,1,1,1,1,1,1,1,1,1,1,0],
+      [0,1,1,1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,6,1,1,1,0],
+      [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,6,0],
+      [0,1,1,1,1,1,6,0,0,0,0,0,0,0,2,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0],
+      [1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,6,1,1,0],
+      [0,1,1,1,1,1,6,0,0,0,2,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,0],
+      [1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,1,1,1,1,1,1,1,6,1,1,1,1,1,0],
+      [0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,5,0,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0],
+      [0,1,1,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4]
+    ]
+  },
+  {
+    names:{ zh:'白霜覆地', en:'Frost Covered', ja:'白霜覆地', ko:'백상복지' },
+    descs:{ zh:'白霜满地，步步惊心', en:'Frost covers ground, every step counts', ja:'白霜地覆、一歩一歩驚心', ko:'서리 땅 덮고, 한 걸음 한 걸음 긴장' },
+    grid:[
+      [4,0,0,0,1,0,0,6,0,0,0,1,0,0,0,0,6,0,0,0],
+      [0,1,1,0,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0],
+      [1,1,0,1,1,1,1,1,1,6,1,1,1,1,1,1,1,1,0,0],
+      [0,0,0,6,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,1,1,0,1,1,1,1,6,1,1,1,1,1,0,1,1,1,0],
+      [0,0,0,0,0,0,6,0,0,0,0,2,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,6,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,1,0,1,1,1,1,6,1,1,1,1,0,1,1,1,1,1,0],
+      [0,0,0,0,0,6,0,0,0,0,2,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,6,1,1,1,0],
+      [0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0],
+      [0,0,0,0,0,0,6,0,0,0,0,0,6,0,0,0,0,0,0,0],
+      [0,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3]
+    ]
+  },
+  {
+    names:{ zh:'瓜王出世', en:'Melon King', ja:'瓜王出世', ko:'과왕출세' },
+    descs:{ zh:'瓜中之王，终极考验', en:'King of melons, ultimate test', ja:'瓜の王、究極の試練', ko:'과일의 왕, 최종 시험' },
+    grid:[
+      [0,0,0,1,0,0,6,0,0,0,1,0,0,0,0,2,0,0,0,3],
+      [0,1,0,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,6,0],
+      [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,1,1,1,6,1,1,1,1,1,1,1,6,1,1,1,1,0],
+      [0,1,1,1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0],
+      [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,1,6,1,1,1,1,1,0,1,1,1,6,0],
+      [0,1,1,1,1,1,6,0,0,0,0,2,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0],
+      [1,1,1,0,1,1,1,0,0,0,0,0,5,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,6,1,1,0],
+      [0,1,1,1,1,1,6,0,0,0,2,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,0],
+      [1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,1,1,1,1,1,1,1,6,1,1,1,1,1,0],
+      [0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5],
+      [0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0],
+      [0,1,1,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [4,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0]
     ]
   }
 ];
@@ -1393,6 +1613,7 @@ var celebrationParticles3D = [];
 var radarSphere3D = null;
 var portalMeshes3D = {};
 var portalPairs = {};
+var rawMelonMeshes3D = {};
 
 var playerTargetX3D = 0;
 var playerTargetZ3D = 0;
@@ -1648,6 +1869,27 @@ function buildMaze3D() {
         scene3D.add(melon);
         melonMeshes3D[key] = melon;
       }
+
+      if (cell === 6) {
+        // 生瓜蛋子（暗绿色浮空方块，带刺）
+        var rGeo = new THREE.OctahedronGeometry(0.9, 0);
+        var rMat = new THREE.MeshStandardMaterial({
+          color: 0x6B8E23,
+          emissive: 0x1A2E00,
+          roughness: 0.7,
+          metalness: 0.1
+        });
+        var rawMelon = new THREE.Mesh(rGeo, rMat);
+        rawMelon.position.set(wx, 1.4, wz);
+        rawMelon.castShadow = true;
+        rawMelon.visible = false;
+        rawMelon.userData = {
+          phase: Math.random() * Math.PI * 2,
+          key: key
+        };
+        scene3D.add(rawMelon);
+        rawMelonMeshes3D[key] = rawMelon;
+      }
     }
   }
 
@@ -1758,6 +2000,9 @@ function clearMaze3D() {
   for (var key in melonMeshes3D) disposeMesh(melonMeshes3D[key]);
   melonMeshes3D = {};
 
+  for (var key in rawMelonMeshes3D) disposeMesh(rawMelonMeshes3D[key]);
+  rawMelonMeshes3D = {};
+
   disposeMesh(exitMesh3D);
   exitMesh3D = null;
 
@@ -1848,6 +2093,11 @@ function updateScene3D() {
     var pVis = !!G.explored[key];
     if (portalMeshes3D[key].ring) portalMeshes3D[key].ring.visible = pVis;
     if (portalMeshes3D[key].glow) portalMeshes3D[key].glow.visible = pVis;
+  }
+
+  // 生瓜蛋子可见性
+  for (var key in rawMelonMeshes3D) {
+    rawMelonMeshes3D[key].visible = !!G.explored[key];
   }
 
   // 玩家目标位置
@@ -1944,6 +2194,16 @@ function animate3D() {
       mesh.position.y = 1.6 + Math.sin(t * 2 + mesh.userData.phase) * 0.3;
       mesh.rotation.y += 0.02;
       mesh.rotation.x = Math.sin(t * 1.5 + mesh.userData.phase) * 0.12;
+    }
+  }
+
+  // 生瓜蛋子浮动+旋转
+  for (var key in rawMelonMeshes3D) {
+    var rMesh = rawMelonMeshes3D[key];
+    if (rMesh.visible) {
+      rMesh.position.y = 1.4 + Math.sin(t * 2.5 + rMesh.userData.phase) * 0.25;
+      rMesh.rotation.y += 0.03;
+      rMesh.rotation.x += 0.02;
     }
   }
 
@@ -2293,6 +2553,30 @@ function updateExplored() {
   }
 }
 
+// ======================== 生瓜蛋子处理 ========================
+function handleRawMelon(key, gx, gy) {
+  G.grid[gy][gx] = 0;
+  G.energy -= 3;
+  if (G.energy < 0) G.energy = 0;
+  showToast(t('toastUnripe'));
+  if (rawMelonMeshes3D[key]) {
+    scene3D.remove(rawMelonMeshes3D[key]);
+    rawMelonMeshes3D[key].geometry.dispose();
+    rawMelonMeshes3D[key].material.dispose();
+    delete rawMelonMeshes3D[key];
+  }
+  // 选瓜知识卡：首次碰到弹南瓜卡，第三次弹苦瓜卡
+  var rawHits = parseInt(localStorage.getItem('eatgua_raw_hits') || '0') + 1;
+  localStorage.setItem('eatgua_raw_hits', String(rawHits));
+  if (rawHits === 1 && !localStorage.getItem('eatgua_kc_pick_pumpkin')) {
+    localStorage.setItem('eatgua_kc_pick_pumpkin', '1');
+    setTimeout(function(){ showKc('pick_pumpkin'); }, 800);
+  } else if (rawHits >= 3 && !localStorage.getItem('eatgua_kc_pick_bitter')) {
+    localStorage.setItem('eatgua_kc_pick_bitter', '1');
+    setTimeout(function(){ showKc('pick_bitter'); }, 800);
+  }
+}
+
 // ======================== 移动 ========================
 function tryMove(dx, dy) {
   if (G.paused) return;
@@ -2322,6 +2606,11 @@ function tryMove(dx, dy) {
   if (G.melons[key]) {
     eatMelon(G.melons[key], nx, ny);
     delete G.melons[key];
+  }
+
+  // 生瓜蛋子
+  if (G.grid[ny][nx] === 6) {
+    handleRawMelon(key, nx, ny);
   }
 
   // 传送门
@@ -2476,6 +2765,12 @@ function tryWood(tx, ty) {
 
   var key = tx + ',' + ty;
   if (G.melons[key]) { eatMelon(G.melons[key], tx, ty); delete G.melons[key]; }
+
+  // 生瓜蛋子
+  if (G.grid[ty][tx] === 6) {
+    handleRawMelon(key, tx, ty);
+  }
+
   if (G.grid[ty][tx] === 3) { levelComplete(); return true; }
 
   updateUI();
@@ -2699,6 +2994,9 @@ function drawMinimap() {
         ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
       } else if (cell === 5) {
         ctx.fillStyle = 'rgba(102,136,255,0.35)';
+        ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
+      } else if (cell === 6) {
+        ctx.fillStyle = 'rgba(107,142,35,0.4)';
         ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
       } else {
         ctx.fillStyle = 'rgba(255,255,255,0.04)';
