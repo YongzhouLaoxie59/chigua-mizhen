@@ -17,7 +17,7 @@ body {
 /* 右上角控制区 */
 #top-right-controls {
   position: fixed; top: 10px; right: 10px; z-index: 60;
-  display: flex; flex-direction: column; gap: 5px; align-items: center;
+  display: flex; gap: 5px; align-items: center;
 }
 .ctrl-icon-btn {
   width: 36px; height: 36px; border-radius: 50%;
@@ -30,12 +30,25 @@ body {
 }
 .ctrl-icon-btn:hover { background: rgba(93,202,165,0.15); }
 .ctrl-icon-btn:active { transform: scale(0.9); }
-.ctrl-icon-btn.active {
-  background: rgba(93,202,165,0.2);
-  color: #5DCAA5;
-  border-color: rgba(93,202,165,0.6);
+
+/* 底部语种栏 */
+#lang-bar {
+  display: flex; gap: 6px; justify-content: center; width: 100%;
+  padding: 4px 0;
 }
-.lang-separator { width: 20px; height: 1px; background: rgba(93,202,165,0.15); margin: 1px 0; }
+.lang-btn {
+  padding: 3px 10px; font-size: 10px; font-family: inherit;
+  background: transparent; border: 1px solid rgba(93,202,165,0.25);
+  border-radius: 12px; color: rgba(93,202,165,0.5);
+  cursor: pointer; transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.lang-btn.active {
+  background: rgba(93,202,165,0.2);
+  border-color: rgba(93,202,165,0.7);
+  color: #5DCAA5; font-weight: 700;
+}
+.lang-btn:hover { border-color: rgba(93,202,165,0.6); color: #5DCAA5; }
 
 #game-wrap {
   position: relative; z-index:1;
@@ -122,8 +135,8 @@ body {
 .overlay-box {
   background:linear-gradient(135deg,#1a3320,#0d1b0e);
   border:2px solid rgba(93,202,165,0.3);
-  border-radius:16px; padding:30px 24px; text-align:center;
-  max-width:340px; width:90%;
+  border-radius:16px; padding:24px 20px; text-align:center;
+  max-width:340px; width:90%; max-height:90vh; overflow-y:auto;
 }
 .overlay-title { font-size:24px; font-weight:900; margin-bottom:8px; }
 .overlay-desc { font-size:14px; color:rgba(255,255,255,0.7); margin-bottom:16px; line-height:1.6; }
@@ -233,6 +246,44 @@ body {
 .level-btn-desc { font-size:11px; font-weight:400; opacity:0.6; }
 .entry-footer { font-size:12px; color:rgba(255,255,255,0.2); margin-top:20px; }
 
+/* 选关按钮（封面用） */
+.select-level-btn {
+  padding:16px 48px; border-radius:14px; border:2px solid rgba(93,202,165,0.5);
+  background:linear-gradient(135deg,rgba(29,158,117,0.3),rgba(15,110,86,0.3));
+  color:#5DCAA5; cursor:pointer; font-size:20px; font-weight:900;
+  letter-spacing:4px; transition:all 0.3s; text-align:center;
+}
+.select-level-btn:hover { background:linear-gradient(135deg,rgba(29,158,117,0.5),rgba(15,110,86,0.5)); border-color:rgba(93,202,165,0.8); transform:scale(1.03); }
+.select-level-btn:active { transform:scale(0.97); }
+
+/* 选关弹窗 */
+#level-select-modal {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.85); z-index:180;
+  align-items:center; justify-content:center;
+}
+#level-select-modal.show { display:flex; }
+.level-select-box {
+  background:linear-gradient(135deg,#1a3320,#0d1b0e);
+  border:2px solid rgba(93,202,165,0.3);
+  border-radius:16px; padding:24px 20px; text-align:center;
+  max-width:340px; width:90%; max-height:80vh; overflow-y:auto;
+}
+.level-select-title { font-size:18px; font-weight:900; color:#5DCAA5; margin-bottom:16px; letter-spacing:2px; }
+.level-select-list-modal { display:flex; flex-direction:column; gap:10px; }
+.level-select-close {
+  margin-top:14px; padding:8px 24px; border-radius:8px; border:1px solid rgba(255,255,255,0.2);
+  background:transparent; color:rgba(255,255,255,0.5); cursor:pointer; font-size:13px;
+}
+
+/* 通关全貌小地图 */
+.overlay-minimap {
+  margin:8px auto; border-radius:8px; background:rgba(0,0,0,0.3);
+  border:1px solid rgba(255,255,255,0.08); display:block;
+  max-width:100%;
+}
+.overlay-shortest { font-size:12px; color:rgba(250,199,117,0.85); margin:6px 0 12px; font-style:italic; line-height:1.5; }
+
 .hidden { display:none !important; }
 </style>
 </head>
@@ -241,14 +292,9 @@ body {
 <!-- 背景音乐：Guzheng City by Kevin MacLeod (incompetech.com), CC BY 4.0 -->
 <audio id="bgm-audio" src="bgm_guzheng.mp3" loop preload="auto"></audio>
 
-<!-- 右上角控制区：音乐 + 多语种（竖向） -->
+<!-- 右上角控制区：音乐 -->
 <div id="top-right-controls">
   <button class="ctrl-icon-btn" id="music-btn" onclick="toggleMusic()" title="Music">&#127925;</button>
-  <div class="lang-separator"></div>
-  <button class="ctrl-icon-btn lang-btn active" data-lang="zh" onclick="changeLanguage('zh')">&#20013;</button>
-  <button class="ctrl-icon-btn lang-btn" data-lang="en" onclick="changeLanguage('en')">EN</button>
-  <button class="ctrl-icon-btn lang-btn" data-lang="ja" onclick="changeLanguage('ja')">&#26085;</button>
-  <button class="ctrl-icon-btn lang-btn" data-lang="ko" onclick="changeLanguage('ko')">&#54620;</button>
 </div>
 
 <!-- 入口页 -->
@@ -257,7 +303,13 @@ body {
   <div class="entry-title" id="entry-title-text">&#21507;&#29916;&#36855;&#38453;</div>
   <div class="entry-sub" id="entry-sub-text"></div>
   <div class="entry-story" id="entry-story-text"></div>
-  <div class="level-select" id="level-select-list"></div>
+  <button class="select-level-btn" id="select-level-trigger" onclick="openLevelSelect()"></button>
+  <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:4px 0;">
+    <button class="lang-btn active" data-lang="zh" onclick="changeLanguage('zh')">中 文</button>
+    <button class="lang-btn" data-lang="en" onclick="changeLanguage('en')">English</button>
+    <button class="lang-btn" data-lang="ja" onclick="changeLanguage('ja')">日本語</button>
+    <button class="lang-btn" data-lang="ko" onclick="changeLanguage('ko')">한국어</button>
+  </div>
   <div class="entry-footer" id="entry-footer-text"></div>
 </div>
 
@@ -322,6 +374,22 @@ body {
     <button class="ctrl-btn" id="btn-restart" onclick="restartLevel()"></button>
     <button class="ctrl-btn" id="btn-back" onclick="backToEntry()"></button>
   </div>
+
+  <div id="lang-bar">
+    <button class="lang-btn active" data-lang="zh" onclick="changeLanguage('zh')">中 文</button>
+    <button class="lang-btn" data-lang="en" onclick="changeLanguage('en')">English</button>
+    <button class="lang-btn" data-lang="ja" onclick="changeLanguage('ja')">日本語</button>
+    <button class="lang-btn" data-lang="ko" onclick="changeLanguage('ko')">한국어</button>
+  </div>
+</div>
+
+<!-- 选关弹窗 -->
+<div id="level-select-modal">
+  <div class="level-select-box">
+    <div class="level-select-title" id="level-modal-title"></div>
+    <div class="level-select-list-modal" id="level-select-list"></div>
+    <button class="level-select-close" id="level-modal-close" onclick="closeLevelSelect()"></button>
+  </div>
 </div>
 
 <!-- 通关/失败遮罩 -->
@@ -331,6 +399,8 @@ body {
     <div class="overlay-title" id="overlay-title"></div>
     <div class="overlay-desc" id="overlay-desc"></div>
     <div class="overlay-ach" id="overlay-ach" style="margin-bottom:12px;font-size:13px;color:#FAC775;display:none;"></div>
+    <canvas class="overlay-minimap" id="overlay-minimap" width="280" height="280"></canvas>
+    <div class="overlay-shortest" id="overlay-shortest"></div>
     <button class="overlay-btn" id="overlay-btn"></button>
   </div>
 </div>
@@ -371,8 +441,12 @@ body {
 // ======================== 多语种数据 ========================
 var I18N = {
   zh: {
-    title:'吃瓜迷阵', subtitle:'花田瓜阵', footer:'五大奇功 · 盲盒吃瓜 · 等级晋升', story:'花田深处，花开结瓜。五大奇功，寻路觅瓜。',
+    title:'吃瓜迷阵', subtitle:'花田瓜阵', footer:'五大奇功 · 盲盒吃瓜 · 等级晋升', story:'花田深处，花开结瓜。<br>五大奇功，寻路觅瓜。',
     levelPrefix:'第', levelSuffix:'关', locked:'未解锁',
+    selectLevel:'选 关', levelModalTitle:'选择关卡', levelModalClose:'关闭',
+    overlayShortest:'看看你是否走了最捷径？',
+    overlayShortestPerfect:'牛！你走的就是最捷径，正好{N}步！',
+    overlayShortestResult:'你走了{A}步，最捷径是{S}步，试试能不能更短？',
     lblLevel:'关卡', lblRank:'称号', lblEnergy:'能量', lblCollected:'收集',
     skillTunnel:'缩骨功', skillTunnelCost:'消耗5能量',
     btnRestart:'重新开局', btnBack:'返回选关',
@@ -400,8 +474,12 @@ var I18N = {
     achUnlocked:'成就解锁', overlayStars:'星级评价', speedThreshold:'60秒内'
   },
   en: {
-    title:'Melon Maze', subtitle:'Flower Field Melon Maze', footer:'Five Arts · Blind Box · Rank Up', story:'Deep in flower fields, blossoms bear melons. Master the Five Arts, find your way.',
+    title:'Melon Maze', subtitle:'Flower Field Melon Maze', footer:'Five Arts · Blind Box · Rank Up', story:'Deep in flower fields, blossoms bear melons.<br>Master the Five Arts, find your way.',
     levelPrefix:'Lv.', levelSuffix:'', locked:'Locked',
+    selectLevel:'SELECT', levelModalTitle:'Select Level', levelModalClose:'Close',
+    overlayShortest:'Did you take the shortest path?',
+    overlayShortestPerfect:'Perfect! You found the shortest path, exactly {N} steps!',
+    overlayShortestResult:'You took {A} steps, the shortest is {S}. Try again?',
     lblLevel:'Level', lblRank:'Title', lblEnergy:'Energy', lblCollected:'Found',
     skillTunnel:'Bone Shrink', skillTunnelCost:'Cost 5 energy',
     btnRestart:'Restart', btnBack:'Levels',
@@ -429,8 +507,12 @@ var I18N = {
     achUnlocked:'Achievement Unlocked', overlayStars:'Stars', speedThreshold:'under 60s'
   },
   ja: {
-    title:'吃瓜迷陣', subtitle:'花田瓜陣', footer:'五大奇功 · 盲盒吃瓜 · 等級昇進', story:'花田深く、花は瓜を実らす。五大奇功、道を探り瓜を求める。',
+    title:'吃瓜迷陣', subtitle:'花田瓜陣', footer:'五大奇功 · 盲盒吃瓜 · 等級昇進', story:'花田深く、花は瓜を実らす。<br>五大奇功、道を探り瓜を求める。',
     levelPrefix:'第', levelSuffix:'関', locked:'未解放',
+    selectLevel:'関 選 択', levelModalTitle:'ステージ選択', levelModalClose:'閉じる',
+    overlayShortest:'最短ルートだったかな？',
+    overlayShortestPerfect:'すごい！最短ルートを発見！ちょうど{N}歩！',
+    overlayShortestResult:'あなたは{A}歩、最短は{S}歩。もっと短くできる？',
     lblLevel:'ステージ', lblRank:'称号', lblEnergy:'エネルギー', lblCollected:'収集',
     skillTunnel:'縮骨功', skillTunnelCost:'5エネルギー消費',
     btnRestart:'リスタート', btnBack:'ステージ選択',
@@ -458,8 +540,12 @@ var I18N = {
     achUnlocked:'実績解除', overlayStars:'星評価', speedThreshold:'60秒以内'
   },
   ko: {
-    title:'과일 미궁', subtitle:'화전과진', footer:'오대기공 · 블라인드박스 · 등급 승급', story:'화전 깊은 곳, 꽃이 과일을 맺는다. 오대기공, 길을 찾아 과일을 구하다.',
+    title:'과일 미궁', subtitle:'화전과진', footer:'오대기공 · 블라인드박스 · 등급 승급', story:'화전 깊은 곳, 꽃이 과일을 맺는다.<br>오대기공, 길을 찾아 과일을 구하다.',
     levelPrefix:'제', levelSuffix:'관', locked:'잠김',
+    selectLevel:'스테이지 선택', levelModalTitle:'스테이지 선택', levelModalClose:'닫기',
+    overlayShortest:'가장 짧은 길을 걸었을까?',
+    overlayShortestPerfect:'대단해요! 가장 짧은 길을 찾았어요! 정확히 {N}걸음!',
+    overlayShortestResult:'{A}걸음 걸었고, 가장 짧은 길은 {S}걸음. 다시 도전?',
     lblLevel:'스테이지', lblRank:'칭호', lblEnergy:'에너지', lblCollected:'수집',
     skillTunnel:'축골공', skillTunnelCost:'5 에너지 소모',
     btnRestart:'다시 시작', btnBack:'스테이지',
@@ -1118,6 +1204,7 @@ var G = {
   exitGridX: -1,
   exitGridY: -1,
   moveHistory: [],
+  fullPath: [],
   skillUsed: false,
   visionTime: 0,
   burnedWalls: {}
@@ -1172,7 +1259,10 @@ function applyI18n() {
   document.getElementById('entry-title-text').textContent = t('title');
   document.getElementById('entry-sub-text').textContent = t('subtitle');
   document.getElementById('entry-footer-text').textContent = t('footer');
-  document.getElementById('entry-story-text').textContent = t('story');
+  document.getElementById('entry-story-text').innerHTML = t('story');
+  document.getElementById('select-level-trigger').textContent = t('selectLevel');
+  document.getElementById('level-modal-title').textContent = t('levelModalTitle');
+  document.getElementById('level-modal-close').textContent = t('levelModalClose');
   document.getElementById('lbl-level').textContent = t('lblLevel');
   document.getElementById('lbl-rank').textContent = t('lblRank');
   document.getElementById('lbl-energy').textContent = t('lblEnergy');
@@ -2090,10 +2180,19 @@ function renderLevelSelect() {
       (savedStars > 0 ? ' <span class="level-stars">' + starStr + '</span>' : '') + '</div>' +
       '<div class="level-btn-desc">' + (locked ? t('locked') : lvDesc) + '</div></div>';
     if (!locked) {
-      btn.onclick = (function(idx){ return function(){ startLevel(idx); }; })(i);
+      btn.onclick = (function(idx){ return function(){ closeLevelSelect(); startLevel(idx); }; })(i);
     }
     list.appendChild(btn);
   }
+}
+
+function openLevelSelect() {
+  renderLevelSelect();
+  document.getElementById('level-select-modal').classList.add('show');
+}
+
+function closeLevelSelect() {
+  document.getElementById('level-select-modal').classList.remove('show');
 }
 
 function startLevel(idx) {
@@ -2113,6 +2212,7 @@ function startLevel(idx) {
   G.radarTime = 0;
   G.visionTime = 0;
   G.moveHistory = [];
+  G.fullPath = [];
   G.skillUsed = false;
   G.skillCardsShown = {};
   G.levelCardsShown = {};
@@ -2142,6 +2242,7 @@ function startLevel(idx) {
       if (G.grid[y][x] === 4) {
         G.playerX = x; G.playerY = y;
         G.grid[y][x] = 0;
+        G.fullPath = [{x:x, y:y}];
       } else if (G.grid[y][x] === 2) {
         G.melons[x + ',' + y] = randomMelon();
         G.grid[y][x] = 0;
@@ -2211,6 +2312,7 @@ function tryMove(dx, dy) {
   G.moveHistory.push({ x: G.playerX, y: G.playerY, energy: G.energy });
   if (G.moveHistory.length > 10) G.moveHistory.shift();
   G.playerX = nx; G.playerY = ny;
+  G.fullPath.push({x: nx, y: ny});
   G.energy -= 0.5;
   if (G.energy < 0) G.energy = 0;
 
@@ -2229,6 +2331,7 @@ function tryMove(dx, dy) {
       var parts = destKey.split(',');
       var dx2 = parseInt(parts[0]), dy2 = parseInt(parts[1]);
       G.playerX = dx2; G.playerY = dy2;
+      G.fullPath.push({x: dx2, y: dy2});
       updateExplored();
       updateUI();
       render();
@@ -2325,6 +2428,7 @@ function tryTunnel(tx, ty) {
   G.moveHistory.push({ x: G.playerX, y: G.playerY, energy: G.energy });
   if (G.moveHistory.length > 10) G.moveHistory.shift();
   G.playerX = tx; G.playerY = ty;
+  G.fullPath.push({x: tx, y: ty});
   G.grid[ty][tx] = 0;
   G.activeSkill = null;
   clearSkillButtons();
@@ -2363,6 +2467,7 @@ function tryWood(tx, ty) {
   G.moveHistory.push({ x: G.playerX, y: G.playerY, energy: G.energy });
   if (G.moveHistory.length > 10) G.moveHistory.shift();
   G.playerX = tx; G.playerY = ty;
+  G.fullPath.push({x: tx, y: ty});
   G.activeSkill = null;
   clearSkillButtons();
   updateExplored();
@@ -2390,6 +2495,7 @@ function doWaterRecall() {
   var target = G.moveHistory[G.moveHistory.length - steps];
   G.playerX = target.x;
   G.playerY = target.y;
+  G.fullPath.push({x: target.x, y: target.y});
   G.energy = Math.min(G.energy + steps * 0.5, RANKS[Math.min(G.levelIdx, RANKS.length - 1)].maxEnergy);
   G.moveHistory = G.moveHistory.slice(0, G.moveHistory.length - steps);
   G.activeSkill = null;
@@ -2455,6 +2561,7 @@ function startGameLoop() {
 // ======================== UI更新 ========================
 function updateUI() {
   var maxE = RANKS[Math.min(G.levelIdx, RANKS.length-1)].maxEnergy;
+  document.getElementById('lv-display').textContent = t('levelPrefix') + (G.levelIdx+1) + t('levelSuffix');
   // 只显示当前能量值，不显示/最大（避免"开局就有消耗"的错觉）
   document.getElementById('energy-display').textContent = Math.floor(G.energy);
   // 能量条以初始能量为100%基准，这样开局看起来是满的
@@ -2538,6 +2645,152 @@ function showOverlay() {
     ob.onclick = function(){ nextLevel(); };
   }
   document.getElementById('overlay').classList.add('show');
+  drawMinimap();
+}
+
+function drawMinimap() {
+  var canvas = document.getElementById('overlay-minimap');
+  var ctx = canvas.getContext('2d');
+  var origGrid = LEVELS[G.levelIdx].grid;
+  var rows = origGrid.length;
+  var cols = origGrid[0].length;
+  var maxSize = window.innerWidth < 480 ? 220 : 260;
+  var cellSize = Math.floor(Math.min(maxSize / cols, maxSize / rows));
+  if (cellSize < 5) cellSize = 5;
+  var w = cellSize * cols;
+  var h = cellSize * rows;
+  canvas.width = w;
+  canvas.height = h;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // 背景
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.fillRect(0, 0, w, h);
+
+  // 找起点和终点
+  var startX = G.fullPath[0] ? G.fullPath[0].x : 0;
+  var startY = G.fullPath[0] ? G.fullPath[0].y : 0;
+  var exitX = G.exitGridX !== undefined ? G.exitGridX : -1;
+  var exitY = G.exitGridY !== undefined ? G.exitGridY : -1;
+  if (exitX < 0) {
+    for (var sy = 0; sy < rows; sy++) {
+      for (var sx = 0; sx < cols; sx++) {
+        if (origGrid[sy][sx] === 3) { exitX = sx; exitY = sy; break; }
+      }
+      if (exitX >= 0) break;
+    }
+  }
+
+  for (var y = 0; y < rows; y++) {
+    for (var x = 0; x < cols; x++) {
+      var cell = origGrid[y][x];
+      var px = x * cellSize;
+      var py = y * cellSize;
+
+      if (cell === 1) {
+        ctx.fillStyle = 'rgba(42,139,92,0.35)';
+        ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
+      } else if (cell === 3) {
+        ctx.fillStyle = 'rgba(250,199,117,0.6)';
+        ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
+      } else if (cell === 4) {
+        ctx.fillStyle = 'rgba(93,202,165,0.5)';
+        ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
+      } else if (cell === 5) {
+        ctx.fillStyle = 'rgba(102,136,255,0.35)';
+        ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.04)';
+        ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
+      }
+    }
+  }
+
+  // BFS 最短路径（考虑传送门）
+  var shortestLen = -1;
+  if (startX >= 0 && startY >= 0 && exitX >= 0) {
+    var visited = {};
+    var queue = [{x: startX, y: startY, steps: 0}];
+    visited[startY + ',' + startX] = true;
+    var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+    while (queue.length > 0) {
+      var cur = queue.shift();
+      if (cur.x === exitX && cur.y === exitY) {
+        shortestLen = cur.steps + 1;
+        break;
+      }
+      for (var d = 0; d < dirs.length; d++) {
+        var nx = cur.x + dirs[d][0];
+        var ny = cur.y + dirs[d][1];
+        if (nx < 0 || nx >= cols || ny < 0 || ny >= rows) continue;
+        if (origGrid[ny][nx] === 1) continue;
+        if (visited[ny + ',' + nx]) continue;
+        visited[ny + ',' + nx] = true;
+        queue.push({x: nx, y: ny, steps: cur.steps + 1});
+        // 传送门配对
+        if (origGrid[ny][nx] === 5 && portalPairs) {
+          var pkey = nx + ',' + ny;
+          var pdest = portalPairs[pkey];
+          if (pdest) {
+            var pcoords = pdest.split(',');
+            var dx = parseInt(pcoords[0]), dy = parseInt(pcoords[1]);
+            if (!visited[dy + ',' + dx]) {
+              visited[dy + ',' + dx] = true;
+              queue.push({x: dx, y: dy, steps: cur.steps + 2});
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 画玩家路径（亮色线条）
+  if (G.fullPath.length > 1) {
+    ctx.strokeStyle = 'rgba(93,202,165,0.85)';
+    ctx.lineWidth = Math.max(2, cellSize * 0.3);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (var i = 0; i < G.fullPath.length; i++) {
+      var p = G.fullPath[i];
+      var cx = p.x * cellSize + cellSize / 2;
+      var cy = p.y * cellSize + cellSize / 2;
+      if (i === 0) ctx.moveTo(cx, cy);
+      else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+  }
+
+  // 起点标记
+  ctx.fillStyle = '#5DCAA5';
+  ctx.beginPath();
+  ctx.arc(startX * cellSize + cellSize / 2, startY * cellSize + cellSize / 2, Math.max(2, cellSize * 0.25), 0, Math.PI * 2);
+  ctx.fill();
+
+  // 终点标记
+  if (exitX >= 0) {
+    ctx.fillStyle = '#FAC775';
+    ctx.beginPath();
+    ctx.arc(exitX * cellSize + cellSize / 2, exitY * cellSize + cellSize / 2, Math.max(2, cellSize * 0.25), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 更新捷径提示
+  var shEl = document.getElementById('overlay-shortest');
+  if (shortestLen > 0 && G.fullPath.length > 0) {
+    var actualLen = G.fullPath.length;
+    if (actualLen === shortestLen) {
+      shEl.textContent = t('overlayShortestPerfect').replace('{N}', shortestLen);
+      shEl.style.color = 'rgba(93,202,165,0.9)';
+    } else {
+      shEl.textContent = t('overlayShortestResult').replace('{A}', actualLen).replace('{S}', shortestLen);
+      shEl.style.color = 'rgba(250,199,117,0.85)';
+    }
+  } else {
+    shEl.textContent = t('overlayShortest');
+    shEl.style.color = 'rgba(250,199,117,0.85)';
+  }
 }
 
 function nextLevel() {
@@ -2551,6 +2804,7 @@ function restartLevel() {
 
 function backToEntry() {
   document.getElementById('overlay').classList.remove('show');
+  document.getElementById('level-select-modal').classList.remove('show');
   document.getElementById('game-wrap').classList.add('hidden');
   document.getElementById('entry-screen').classList.remove('hidden');
   if (animFrameId3D) cancelAnimationFrame(animFrameId3D);
