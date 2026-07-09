@@ -1847,6 +1847,7 @@ var mouse3D = null;
 var groundPlane3D = null;
 
 var groundTiles3D = {};
+var fogTiles3D = {};  // 雾瓦片：未探索区域显示，已探索区域隐藏
 var wallMeshes3D = {};
 var melonMeshes3D = {};
 var exitMesh3D = null;
@@ -1890,6 +1891,8 @@ function init3D() {
   // 场景
   scene3D = new THREE.Scene();
   scene3D.background = new THREE.Color(0x0a120a);
+  // 场景级雾：远景朦胧感，近处清晰（主雾效靠雾瓦片）
+  scene3D.fog = new THREE.Fog(0xC8D6E0, 50, 200);
 
   // 正交相机 — 干净的游戏视角，无透视畸变
   var aspect = 1;
@@ -1982,6 +1985,23 @@ function buildMaze3D() {
       tile.receiveShadow = true;
       scene3D.add(tile);
       groundTiles3D[x + ',' + y] = tile;
+
+      // 雾瓦片：半透明白色平面，未探索时显示
+      var fogGeo = new THREE.PlaneGeometry(CELL_3D + 0.1, CELL_3D + 0.1);
+      var fogMat = new THREE.MeshBasicMaterial({
+        color: 0xDDE8F0,
+        transparent: true,
+        opacity: 0.78 + Math.random() * 0.12,
+        depthWrite: false,
+        fog: false  // 雾瓦片本身不受场景雾影响
+      });
+      var fogTile = new THREE.Mesh(fogGeo, fogMat);
+      fogTile.rotation.x = -Math.PI / 2;
+      fogTile.position.set(x * CELL_3D + CELL_3D/2, 0.7 + Math.random() * 0.3, y * CELL_3D + CELL_3D/2);
+      fogTile.visible = true;  // 初始全雾
+      fogTile.userData.phase = Math.random() * Math.PI * 2;
+      scene3D.add(fogTile);
+      fogTiles3D[x + ',' + y] = fogTile;
     }
   }
 
@@ -2106,7 +2126,8 @@ function buildMaze3D() {
           transparent: true,
           opacity: 0.35,
           side: THREE.DoubleSide,
-          depthWrite: false
+          depthWrite: false,
+          fog: false  // 光柱不受场景雾影响，穿透雾层
         });
         var pillar = new THREE.Mesh(pillarGeo, pillarMat);
         pillar.position.set(wx, 3.0, wz);
@@ -2118,7 +2139,8 @@ function buildMaze3D() {
         var tipMat = new THREE.MeshBasicMaterial({
           color: pc.color,
           transparent: true,
-          opacity: 0.6
+          opacity: 0.6,
+          fog: false  // 光点不受场景雾影响
         });
         var tip = new THREE.Mesh(tipGeo, tipMat);
         tip.position.set(wx, 6.0, wz);
@@ -2296,6 +2318,9 @@ function clearMaze3D() {
   for (var key in groundTiles3D) disposeMesh(groundTiles3D[key]);
   groundTiles3D = {};
 
+  for (var key in fogTiles3D) disposeMesh(fogTiles3D[key]);
+  fogTiles3D = {};
+
   for (var key in wallMeshes3D) disposeMesh(wallMeshes3D[key]);
   wallMeshes3D = {};
 
@@ -2360,6 +2385,11 @@ function updateScene3D() {
     } else {
       groundTiles3D[key].material.color.setHex(0x080f08);
     }
+  }
+
+  // 雾瓦片：已探索区域隐藏，未探索区域显示白雾
+  for (var key in fogTiles3D) {
+    fogTiles3D[key].visible = !G.explored[key];
   }
 
   for (var key in wallMeshes3D) {
@@ -2513,6 +2543,14 @@ function animate3D() {
       rMesh.position.y = 1.4 + Math.sin(t * 2.5 + rMesh.userData.phase) * 0.25;
       rMesh.rotation.y += 0.03;
       rMesh.rotation.x += 0.02;
+    }
+  }
+
+  // 雾气呼吸：opacity 缓慢起伏，营造飘动感
+  for (var key in fogTiles3D) {
+    var fTile = fogTiles3D[key];
+    if (fTile.visible) {
+      fTile.material.opacity = 0.72 + Math.sin(t * 0.8 + fTile.userData.phase) * 0.12;
     }
   }
 
