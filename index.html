@@ -198,6 +198,14 @@ body {
 }
 #toast.show { opacity:1; }
 
+/* 传送门闪烁 */
+#portal-flash {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:80; opacity:0;
+  transition:opacity 0.15s;
+}
+#portal-flash.flash { opacity:0.4; transition:opacity 0.05s; }
+
 /* 通关庆祝文字 */
 #celebration-text {
   position:fixed; top:50%; left:50%;
@@ -436,6 +444,8 @@ body {
 
 <!-- 提示 -->
 <div id="toast"></div>
+<!-- 传送门闪烁遮罩 -->
+<div id="portal-flash"></div>
 
 <script>
 // ======================== 多语种数据 ========================
@@ -844,16 +854,16 @@ var KNOWLEDGE_CARDS = {
     type:'level', emoji:'\u{1F349}',
     zh:{ name:'选瓜知识', title:'西瓜六招',
       intro:'挑西瓜有六句口诀——一弹：手指弹瓜，声音浑厚如鼓是熟瓜，清脆如木鱼是生瓜蛋子；二看蒂：瓜蒂翠绿微弯是新鲜，干枯发黄是陈瓜；三看纹：纹路清晰开阔、底色转黄是熟瓜，纹路模糊泛青是生瓜；四看脐：瓜脐小而内凹的皮薄瓤甜，大而外凸的皮厚瓤少；五掂重：同样大小，重的汁多，轻的可能是空心瓜；六看皮：皮面光滑带白霜是好瓜，粗糙发涩的还没熟。六招合用，百发百中。',
-      facts:'日本研究人员用共振频率仪器检测西瓜，发现成熟瓜的共振频率在100-200赫兹，生瓜在300赫兹以上——"弹瓜听声"原来真有科学依据！' },
+      facts:'现代声学研究证实，成熟西瓜的共振频率在100-200赫兹，生瓜在300赫兹以上——"弹瓜听声"原来真有科学依据！' },
     en:{ name:'Melon Tips', title:'Six Tricks for Watermelon',
       intro:'Six rules for picking watermelons — 1. Tap: flick the melon; a deep drum-like sound means ripe, a sharp wood-block sound means unripe. 2. Stem: green and curled means fresh; dry and yellow means old. 3. Stripes: clear, wide stripes with yellow underside mean ripe; blurry stripes with white-green base mean unripe. 4. Blossom end: small and concave means thin rind and sweet; large and convex means thick rind. 5. Weight: heavier means juicier; lighter may be hollow. 6. Skin: smooth with white frost means ripe; rough and dull means unripe. Use all six for a perfect pick!',
-      facts:'Japanese researchers used resonance frequency instruments to test watermelons — ripe ones resonate at 100-200 Hz, unripe ones above 300 Hz. "Tap and listen" is scientifically proven!' },
+      facts:'Modern acoustic research confirms that ripe watermelons resonate at 100-200 Hz, while unripe ones resonate above 300 Hz. "Tap and listen" is scientifically proven!' },
     ja:{ name:'選瓜知識', title:'スイカ六選',
       intro:'スイカ選びの六カ条——一弾：指ではじく、低い太鼓の音は熟れ、鋭い木魚の音は生瓜蛋子；二茎：へたが緑で曲がっていれば新鮮、枯れて黄色なら古い；三紋：縞模様がはっきり広く底が黄色なら熟れ、ぼんやり青白ければ生瓜；四臍：おへそが小さくへこんでいれば皮薄で甘い、大きく盛り上がっていれば皮厚；五重：同じ大きさなら重い方がジューシー、軽いのは空洞かも；六皮：表面が滑らかで白い粉があれば熟れ、ザラザラならまだ未熟。六招使いこなせば百発百中。',
-      facts:'日本の研究チームが共振周波数でスイカを調査——熟れた瓜は100-200Hz、生瓜は300Hz以上。「弾瓜聴音」には科学的根拠があった！' },
+      facts:'現代の音響学研究により、熟れたスイカの共振周波数は100-200Hz、生瓜は300Hz以上であることが実証された。「弾瓜聴音」には科学的根拠があった！' },
     ko:{ name:'과일 지식', title:'수박 육선',
       intro:'수박 고르기 육칙——일탄: 손가락으로 두드리면 둥근 북소리는 잘 익은 것, 날카로운 목탁 소리는 생과; 이줄기: 줄기가 녹색이고 구부러지면 신선, 말려 노랗으면 오래됨; 삼무늬: 줄무늬가 선명하고 넓으며 바닥이 노란색이면 익음, 흐릿하고 푸르스름하면 생과; 사배꼽: 배꼽이 작고 오목하면 껍질 얇고 달고, 크고 볼록하면 껍질 두꺼움; 오무게: 같은 크기면 무거운 것이 즙 많고, 가벼운 것은 속이 비었을 수도; 유피: 표면이 매끄럽고 흰 가루가 있으면 익고, 거칠면 미숙. 육법을 모두 쓰면 백발백중!',
-      facts:'일본 연구진이 공진 주파수 기기로 수박을 검사한 결과, 잘 익은 수박은 100-200Hz, 생수박은 300Hz 이상이었습니다. "두드려 듣기"에는 과학적 근거가 있었습니다!' }
+      facts:'현대 음향학 연구에 따르면 잘 익은 수박의 공진 주파수는 100-200Hz, 생수박은 300Hz 이상입니다. "두드려 듣기"에는 과학적 근거가 있었습니다!' }
   },
   level_11: {
     type:'level', emoji:'\u{1F952}',
@@ -1009,16 +1019,16 @@ var KNOWLEDGE_CARDS = {
     type:'level', emoji:'\u{1F9D8}',
     zh:{ name:'瓜艺杂谈', title:'瓜道至简',
       intro:'中国人把瓜吃出了哲学。一句"顺藤摸瓜"道出顺势而为的智慧——不硬来，沿着线索自然抵达目标。老农选瓜不靠仪器，弹一弹、掂一掂、看一看，凭手感就知道好坏。这种"大道至简"的直觉判断，正是瓜田里练出的真功夫。',
-      facts:'道家讲"大音希声，大象无形"，种瓜也一样。最好的瓜农不追求最复杂的种植技术，而是顺应天时地利——什么季节种什么瓜，什么土壤施什么肥。日本"夕张蜜瓜"一棵藤只留一个果，极致简约却卖出天价，也是这个道理的极致体现。' },
+      facts:'道家讲"大音希声，大象无形"，种瓜也一样。最好的瓜农不追求最复杂的种植技术，而是顺应天时地利——什么季节种什么瓜，什么土壤施什么肥。新疆瓜农自古讲究"一藤一瓜"——每藤只留最强壮的幼果，集中全部养分，种出的瓜格外甜美。"大道至简"在瓜田里也是真理。' },
     en:{ name:'Melon Culture', title:'The Way of Melon',
       intro:'The Chinese have turned eating melons into philosophy. "Follow the vine to find the melon" captures the wisdom of going with the flow — don\'t force it, follow the clues and arrive naturally. Old farmers pick melons without instruments — tap, weigh, look — and know quality by feel alone. This "great simplicity" intuition is true skill honed in the fields.',
-      facts:'Daoism says "the greatest sound is barely heard, the greatest form has no shape." Growing melons is the same. The best farmers don\'t chase complex techniques but follow nature — right season, right soil, right melon. Japan\'s Yubari melon keeps only one fruit per vine — ultimate simplicity that sells for astronomical prices.' },
+      facts:'Daoism says "the greatest sound is barely heard, the greatest form has no shape." Growing melons is the same. The best farmers don\'t chase complex techniques but follow nature — right season, right soil, right melon. Xinjiang farmers have long practiced "one vine, one melon" — keeping only the strongest fruit per vine, concentrating all nutrients for exceptional sweetness. Simplicity itself.' },
     ja:{ name:'瓜芸雑談', title:'瓜道至簡',
       intro:'中国人は瓜を哲学にまで高めた。「順藤摸瓜（蔓を辿って瓜を摸る）」という一言に順勢而為の知恵が込められている——無理をせず、手がかりに沿って自然に到達する。老農は瓜を仪器に頼らず選ぶ——弾き、量り、見て、手触りだけで良し悪しが分かる。この「大道至簡」の直感判断こそ瓜田で磨いた真功夫である。',
-      facts:'道家は「大音希声、大象無形」と説く。瓜作りも同じ。最高の瓜農は複雑な技術を追わず天時地利に順う——季節に合った瓜を、土壌に合った肥やしを。日本の「夕張メロン」は一蔓に一果だけ残し、究極の簡素さで天価で売られる。同じ道理の極みである。' },
+      facts:'道家は「大音希声、大象無形」と説く。瓜作りも同じ。最高の瓜農は複雑な技術を追わず天時地利に順う——季節に合った瓜を、土壌に合った肥やしを。新疆の瓜農は古くから「一蔓一瓜」を実践——一本の蔓に最も強い果実だけを残し、全栄養を集中させて格外に甘い瓜を育てる。簡素さの極みである。' },
     ko:{ name:'과예잡담', title:'과도지간',
       intro:'중국인은 과를 철학으로 승화시켰다. "순등모과(넝쿨을 따라 과를 찾는다)"라는 말에 순세이위의 지혜가 담겨 있다— 무리하지 말고 단서를 따라 자연스럽게 도달한다. 노농은 기기 없이 과를 고른다— 톡톡, 무게, 눈으로 손맛만으로 품질을 안다. 이 "대도지간"의 직관 판단이 밭에서 갈고닦은 진정한 공부다.',
-      facts:'도가는 "대음희성, 대상무형"을 말한다. 과 재배도 같다. 최고의 농부는 복잡한 기술을 좇지 않고 천시지리에 순응한다— 계절에 맞는 과, 토양에 맞는 비료. 일본 "유바리 멜론"은 한 넝쿨에 한 과만 남겨 극치의 간결함으로 천문학적 가격에 팔린다. 같은 이치의 극치다.' }
+      facts:'도가는 "대음희성, 대상무형"을 말한다. 과 재배도 같다. 최고의 농부는 복잡한 기술을 좇지 않고 천시지리에 순응한다— 계절에 맞는 과, 토양에 맞는 비료. 신장의 과농은 예부터 "일넝쿨 일과"를 실천해 왔다— 한 넝쿨에 가장 강한 과일만 남기고 모든 영양을 집중시켜 유난히 달콤한 과를 키운다. 간결함의 극치다.' }
   },
   skill_tunnel: {
     type:'skill', emoji:'\u{1F9CD}',
@@ -1615,13 +1625,25 @@ var LEVELS = [
 ];
 
 // ======================== 等级数据 ========================
+// 每关独立能量配置：start=起始能量, max=上限(吃盲盒回血不超过此值)
+var LEVEL_ENERGY = [
+  {start:15, max:25},  {start:18, max:28},  {start:21, max:32},  {start:24, max:36},  {start:26, max:39},
+  {start:28, max:42},  {start:30, max:45},  {start:32, max:48},  {start:34, max:51},  {start:36, max:54},
+  {start:38, max:55},  {start:39, max:56},  {start:40, max:58},  {start:41, max:59},  {start:42, max:60},
+  {start:44, max:63},  {start:46, max:65},  {start:48, max:68},  {start:52, max:72},  {start:56, max:78}
+];
+function getMaxEnergy(idx) {
+  var e = LEVEL_ENERGY[idx] || LEVEL_ENERGY[LEVEL_ENERGY.length-1];
+  return e.max;
+}
+
 var RANKS = [
-  { names:{ zh:'吃瓜新手', en:'Melon Rookie', ja:'吃瓜ルーキー', ko:'과일 루키' }, maxEnergy:20, color:'#97C459' },
-  { names:{ zh:'吃瓜小咖', en:'Melon Fan',    ja:'吃瓜ファン',   ko:'과일 팬'    }, maxEnergy:30, color:'#5DCAA5' },
-  { names:{ zh:'吃瓜达人', en:'Melon Expert', ja:'吃瓜プロ',     ko:'과일 프로'  }, maxEnergy:50, color:'#FAC775' },
-  { names:{ zh:'吃瓜大神', en:'Melon Master', ja:'吃瓜マスター', ko:'과일 마스터'}, maxEnergy:80, color:'#D85A30' },
-  { names:{ zh:'吃瓜宗师', en:'Melon Sage',   ja:'吃瓜セイジ',   ko:'과일 세이지'}, maxEnergy:100, color:'#9B59B6' },
-  { names:{ zh:'吃瓜传奇', en:'Melon Legend', ja:'吃瓜レジェンド',ko:'과일 레전드'}, maxEnergy:120, color:'#E74C3C' }
+  { names:{ zh:'吃瓜新手', en:'Melon Rookie', ja:'吃瓜ルーキー', ko:'과일 루키' }, maxEnergy:25, color:'#97C459' },
+  { names:{ zh:'吃瓜小咖', en:'Melon Fan',    ja:'吃瓜ファン',   ko:'과일 팬'    }, maxEnergy:32, color:'#5DCAA5' },
+  { names:{ zh:'吃瓜达人', en:'Melon Expert', ja:'吃瓜プロ',     ko:'과일 프로'  }, maxEnergy:48, color:'#FAC775' },
+  { names:{ zh:'吃瓜大神', en:'Melon Master', ja:'吃瓜マスター', ko:'과일 마스ター'}, maxEnergy:60, color:'#D85A30' },
+  { names:{ zh:'吃瓜宗师', en:'Melon Sage',   ja:'吃瓜セイジ',   ko:'과일 세이지'}, maxEnergy:70, color:'#9B59B6' },
+  { names:{ zh:'吃瓜传奇', en:'Melon Legend', ja:'吃瓜レジェンド',ko:'과일 레전드'}, maxEnergy:78, color:'#E74C3C' }
 ];
 
 // ======================== 游戏状态 ========================
@@ -1834,6 +1856,13 @@ var celebrationParticles3D = [];
 var radarSphere3D = null;
 var portalMeshes3D = {};
 var portalPairs = {};
+var portalPairIndex = {};  // key → 配对编号(0,1,2...)，用于分色
+// 传送门配对颜色：第1对青色、第2对品红、第3对金色
+var PORTAL_COLORS = [
+  { color: 0x00E5FF, emissive: 0x0099BB, css: '#00E5FF' },
+  { color: 0xFF44DD, emissive: 0xAA0099, css: '#FF44DD' },
+  { color: 0xFFD700, emissive: 0xBB9900, css: '#FFD700' }
+];
 var rawMelonMeshes3D = {};
 
 var playerTargetX3D = 0;
@@ -2038,13 +2067,17 @@ function buildMaze3D() {
       }
 
       if (cell === 5) {
-        // 传送门（蓝紫色光环）
+        // 传送门：根据配对编号分色 + 竖直光柱(迷雾中可见)
+        var pIdx = portalPairIndex[key] || 0;
+        var pc = PORTAL_COLORS[pIdx % PORTAL_COLORS.length];
         var pGroup = new THREE.Group();
-        var ringGeo = new THREE.TorusGeometry(1.2, 0.15, 8, 24);
+
+        // 地面光环（更大更亮）
+        var ringGeo = new THREE.TorusGeometry(1.5, 0.25, 8, 28);
         var ringMat = new THREE.MeshStandardMaterial({
-          color: 0x6688FF,
-          emissive: 0x3344AA,
-          emissiveIntensity: 0.8,
+          color: pc.color,
+          emissive: pc.emissive,
+          emissiveIntensity: 1.0,
           roughness: 0.2,
           metalness: 0.5
         });
@@ -2054,16 +2087,43 @@ function buildMaze3D() {
         ring.visible = false;
         pGroup.add(ring);
 
-        var glowGeo = new THREE.CylinderGeometry(1.0, 1.4, 0.5, 16);
+        // 地面辉光
+        var glowGeo = new THREE.CylinderGeometry(1.2, 1.8, 0.5, 16);
         var glowMat = new THREE.MeshBasicMaterial({
-          color: 0x6688FF,
+          color: pc.color,
           transparent: true,
-          opacity: 0.2
+          opacity: 0.3
         });
         var glow = new THREE.Mesh(glowGeo, glowMat);
         glow.position.set(wx, 0.25, wz);
         glow.visible = false;
         pGroup.add(glow);
+
+        // 竖直光柱：高6单位，迷雾中始终可见（信标效果）
+        var pillarGeo = new THREE.CylinderGeometry(0.5, 0.9, 6.0, 12, 1, true);
+        var pillarMat = new THREE.MeshBasicMaterial({
+          color: pc.color,
+          transparent: true,
+          opacity: 0.35,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        var pillar = new THREE.Mesh(pillarGeo, pillarMat);
+        pillar.position.set(wx, 3.0, wz);
+        pillar.visible = true;  // 光柱始终可见，不受迷雾限制
+        pGroup.add(pillar);
+
+        // 光柱顶端光点
+        var tipGeo = new THREE.SphereGeometry(0.4, 8, 8);
+        var tipMat = new THREE.MeshBasicMaterial({
+          color: pc.color,
+          transparent: true,
+          opacity: 0.6
+        });
+        var tip = new THREE.Mesh(tipGeo, tipMat);
+        tip.position.set(wx, 6.0, wz);
+        tip.visible = true;
+        pGroup.add(tip);
 
         // 配对光束：连接配对传送门的高空细光柱
         var beamMesh = null;
@@ -2074,20 +2134,20 @@ function buildMaze3D() {
           var dwx = (dx - G.cols/2) * CELL;
           var dwz = (dy - G.rows/2) * CELL;
           var dist = Math.sqrt((dwx-wx)*(dwx-wx) + (dwz-wz)*(dwz-wz));
-          var beamGeo = new THREE.CylinderGeometry(0.08, 0.08, dist, 6);
+          var beamGeo = new THREE.CylinderGeometry(0.12, 0.12, dist, 6);
           var beamMat = new THREE.MeshBasicMaterial({
-            color: 0x88AAFF, transparent: true, opacity: 0.15
+            color: pc.color, transparent: true, opacity: 0.25
           });
           beamMesh = new THREE.Mesh(beamGeo, beamMat);
-          beamMesh.position.set((wx+dwx)/2, 4, (wz+dwz)/2);
-          beamMesh.lookAt(new THREE.Vector3(dwx, 4, dwz));
+          beamMesh.position.set((wx+dwx)/2, 5, (wz+dwz)/2);
+          beamMesh.lookAt(new THREE.Vector3(dwx, 5, dwz));
           beamMesh.rotateX(Math.PI/2);
           beamMesh.visible = false;
           scene3D.add(beamMesh);
         }
 
         scene3D.add(pGroup);
-        portalMeshes3D[key] = { ring: ring, glow: glow, beam: beamMesh };
+        portalMeshes3D[key] = { ring: ring, glow: glow, beam: beamMesh, pillar: pillar, tip: tip, pairIdx: pIdx };
       }
 
       if (G.melons[key]) {
@@ -2282,9 +2342,12 @@ function clearMaze3D() {
     if (portalMeshes3D[key].ring) disposeMesh(portalMeshes3D[key].ring);
     if (portalMeshes3D[key].glow) disposeMesh(portalMeshes3D[key].glow);
     if (portalMeshes3D[key].beam) disposeMesh(portalMeshes3D[key].beam);
+    if (portalMeshes3D[key].pillar) disposeMesh(portalMeshes3D[key].pillar);
+    if (portalMeshes3D[key].tip) disposeMesh(portalMeshes3D[key].tip);
   }
   portalMeshes3D = {};
   portalPairs = {};
+  portalPairIndex = {};
 }
 
 function updateScene3D() {
@@ -2331,11 +2394,14 @@ function updateScene3D() {
     if (exitMesh3D.userData.beam) exitMesh3D.userData.beam.visible = eVis;
   }
 
-  // 传送门可见性
+  // 传送门可见性：光环/辉光需探索到才可见，竖直光柱始终可见(信标)
   for (var key in portalMeshes3D) {
     var pVis = !!G.explored[key];
     if (portalMeshes3D[key].ring) portalMeshes3D[key].ring.visible = pVis;
     if (portalMeshes3D[key].glow) portalMeshes3D[key].glow.visible = pVis;
+    // pillar 和 tip 始终可见，迷雾中也能看到光柱
+    if (portalMeshes3D[key].pillar) portalMeshes3D[key].pillar.visible = true;
+    if (portalMeshes3D[key].tip) portalMeshes3D[key].tip.visible = true;
   }
 
   // 生瓜蛋子可见性
@@ -2450,21 +2516,31 @@ function animate3D() {
     }
   }
 
-  // 传送门旋转+脉冲+配对光束
+  // 传送门旋转+脉冲+光柱脉动+配对光束
   for (var key in portalMeshes3D) {
     var p = portalMeshes3D[key];
+    // 光柱始终脉动（即使迷雾中）
+    if (p.pillar && p.pillar.visible) {
+      p.pillar.material.opacity = 0.25 + Math.sin(t * 2.5 + (p.pairIdx || 0) * 1.5) * 0.15;
+      p.pillar.rotation.y += 0.01;
+    }
+    if (p.tip && p.tip.visible) {
+      p.tip.position.y = 6.0 + Math.sin(t * 2 + (p.pairIdx || 0)) * 0.3;
+      p.tip.material.opacity = 0.4 + Math.sin(t * 3) * 0.2;
+    }
+    // 地面光环需探索到才动
     if (p.ring && p.ring.visible) {
-      p.ring.rotation.z += 0.02;
-      var pulse = 0.6 + Math.sin(t * 3) * 0.3;
+      p.ring.rotation.z += 0.03;
+      var pulse = 0.7 + Math.sin(t * 3) * 0.3;
       p.ring.material.emissiveIntensity = pulse;
-      if (p.glow) p.glow.material.opacity = 0.15 + Math.sin(t * 3) * 0.1;
-      // 配对光束：如果配对传送门也可见，画连接线
+      if (p.glow) p.glow.material.opacity = 0.2 + Math.sin(t * 3) * 0.15;
+      // 配对光束：如果配对传送门也探索到了，显示连接线
       if (p.beam) {
         var destKey = portalPairs[key];
         var bothVisible = destKey && G.explored[destKey];
         p.beam.visible = !!bothVisible;
         if (p.beam.visible) {
-          p.beam.material.opacity = 0.12 + Math.sin(t * 2) * 0.08;
+          p.beam.material.opacity = 0.15 + Math.sin(t * 2) * 0.1;
         }
       }
     }
@@ -2725,8 +2801,9 @@ function startLevel(idx) {
   G.grid = level.grid.map(function(row){ return row.slice(); });
   G.cols = G.grid[0].length;
   G.rows = G.grid.length;
-  G.energy = 12 + idx * 6;
-  G.initialEnergy = 12 + idx * 6;
+  var le = LEVEL_ENERGY[idx] || LEVEL_ENERGY[LEVEL_ENERGY.length-1];
+  G.energy = le.start;
+  G.initialEnergy = le.start;
   G.explored = {};
   G.melons = {};
   G.collected = {};
@@ -2742,6 +2819,7 @@ function startLevel(idx) {
   G.burnedWalls = {};
   // 初始化传送门配对
   portalPairs = {};
+  portalPairIndex = {};
   var portalCells = [];
   for (var y = 0; y < G.rows; y++) {
     for (var x = 0; x < G.cols; x++) {
@@ -2750,8 +2828,11 @@ function startLevel(idx) {
   }
   for (var i = 0; i < portalCells.length - 1; i += 2) {
     var a = portalCells[i], b = portalCells[i+1];
+    var pairIdx = Math.floor(i / 2);
     portalPairs[a.x + ',' + a.y] = b.x + ',' + b.y;
     portalPairs[b.x + ',' + b.y] = a.x + ',' + a.y;
+    portalPairIndex[a.x + ',' + a.y] = pairIdx;
+    portalPairIndex[b.x + ',' + b.y] = pairIdx;
   }
   G.startTime = Date.now();
   G.paused = false;
@@ -2882,6 +2963,8 @@ function tryMove(dx, dy) {
     if (destKey) {
       var parts = destKey.split(',');
       var dx2 = parseInt(parts[0]), dy2 = parseInt(parts[1]);
+      var pIdx = portalPairIndex[key] || 0;
+      flashPortal(pIdx);
       G.playerX = dx2; G.playerY = dy2;
       G.fullPath.push({x: dx2, y: dy2});
       updateExplored();
@@ -2912,7 +2995,7 @@ function eatMelon(melonKey, x, y) {
     updateExplored();
   } else {
     G.energy += base.energy;
-    var maxE = RANKS[Math.min(G.levelIdx, RANKS.length-1)].maxEnergy;
+    var maxE = getMaxEnergy(G.levelIdx);
     if (G.energy > maxE) G.energy = maxE;
     showMelonPop(melonKey, t('energyPlus') + base.energy + t('energyUnit'));
   }
@@ -3042,6 +3125,8 @@ function tryWood(tx, ty) {
       var parts = destKey.split(',');
       G.playerX = parseInt(parts[0]); G.playerY = parseInt(parts[1]);
       G.fullPath.push({x: G.playerX, y: G.playerY});
+      var pIdx = portalPairIndex[key] || 0;
+      flashPortal(pIdx);
       updateExplored();
       showToast(t('toastPortal'));
       updateUI();
@@ -3070,7 +3155,7 @@ function doWaterRecall() {
   G.playerX = target.x;
   G.playerY = target.y;
   G.fullPath.push({x: target.x, y: target.y});
-  G.energy = Math.min(G.energy + steps * 0.5, RANKS[Math.min(G.levelIdx, RANKS.length - 1)].maxEnergy);
+  G.energy = Math.min(G.energy + steps * 0.5, getMaxEnergy(G.levelIdx));
   G.moveHistory = G.moveHistory.slice(0, G.moveHistory.length - steps);
   G.activeSkill = null;
   showToast(t('toastWaterUsed'));
@@ -3154,7 +3239,7 @@ function startGameLoop() {
 
 // ======================== UI更新 ========================
 function updateUI() {
-  var maxE = RANKS[Math.min(G.levelIdx, RANKS.length-1)].maxEnergy;
+  var maxE = getMaxEnergy(G.levelIdx);
   document.getElementById('lv-display').textContent = t('levelPrefix') + (G.levelIdx+1) + t('levelSuffix');
   // 只显示当前能量值，不显示/最大（避免"开局就有消耗"的错觉）
   document.getElementById('energy-display').textContent = Math.floor(G.energy);
@@ -3292,7 +3377,9 @@ function drawMinimap() {
         ctx.fillStyle = 'rgba(93,202,165,0.5)';
         ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
       } else if (cell === 5) {
-        ctx.fillStyle = 'rgba(102,136,255,0.35)';
+        var pIdx2 = portalPairIndex[x + ',' + y] || 0;
+        var pcMini = PORTAL_COLORS[pIdx2 % PORTAL_COLORS.length];
+        ctx.fillStyle = pcMini.css + '59';
         ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
       } else if (cell === 6) {
         ctx.fillStyle = 'rgba(107,142,35,0.4)';
@@ -3724,6 +3811,15 @@ function showToast(msg) {
   tt.classList.add('show');
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(function(){ tt.classList.remove('show'); }, 2000);
+}
+
+// 传送门闪烁：用配对颜色闪一下屏幕
+function flashPortal(pairIdx) {
+  var pc = PORTAL_COLORS[(pairIdx || 0) % PORTAL_COLORS.length];
+  var fl = document.getElementById('portal-flash');
+  fl.style.background = pc.css;
+  fl.classList.add('flash');
+  setTimeout(function(){ fl.classList.remove('flash'); }, 300);
 }
 
 // ======================== 键盘输入 ========================
