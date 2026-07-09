@@ -292,6 +292,53 @@ body {
 }
 .overlay-shortest { font-size:12px; color:rgba(250,199,117,0.85); margin:6px 0 12px; font-style:italic; line-height:1.5; }
 
+/* 广告弹窗 */
+#ad-overlay {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.8); z-index:110;
+  align-items:center; justify-content:center;
+}
+#ad-overlay.show { display:flex; }
+.ad-box {
+  background:linear-gradient(135deg,#1a3320,#0d1b0e);
+  border:2px solid rgba(93,202,165,0.4);
+  border-radius:16px; padding:28px 24px; text-align:center;
+  max-width:320px; width:88%;
+}
+.ad-icon { font-size:40px; margin-bottom:8px; }
+.ad-title { font-size:22px; font-weight:900; color:#E74C3C; margin-bottom:6px; }
+.ad-desc { font-size:14px; color:rgba(255,255,255,0.7); margin-bottom:20px; line-height:1.5; }
+.ad-btn-watch {
+  width:100%; padding:14px; border:none; border-radius:10px;
+  background:linear-gradient(135deg,#1D9E75,#0F6E56);
+  color:#fff; font-size:16px; font-weight:700; cursor:pointer;
+  margin-bottom:10px; transition:transform 0.1s;
+}
+.ad-btn-watch:active { transform:scale(0.96); }
+.ad-btn-watch:disabled { opacity:0.4; cursor:not-allowed; }
+.ad-btn-restart {
+  width:100%; padding:12px; border:1px solid rgba(255,255,255,0.2);
+  border-radius:10px; background:transparent;
+  color:rgba(255,255,255,0.6); font-size:14px; cursor:pointer;
+  transition:all 0.15s;
+}
+.ad-btn-restart:hover { border-color:rgba(255,255,255,0.4); color:rgba(255,255,255,0.8); }
+.ad-note { font-size:11px; color:rgba(255,255,255,0.3); margin-top:14px; }
+.ad-countdown {
+  font-size:48px; font-weight:900; color:#5DCAA5; margin:10px 0;
+}
+.ad-progress {
+  width:100%; height:6px; background:rgba(255,255,255,0.1);
+  border-radius:3px; overflow:hidden; margin:12px 0;
+}
+.ad-progress-bar {
+  height:100%; background:linear-gradient(90deg,#5DCAA5,#1D9E75);
+  border-radius:3px; transition:width 0.3s linear;
+}
+.ad-done {
+  font-size:28px; font-weight:900; color:#5DCAA5; margin:16px 0;
+}
+
 .hidden { display:none !important; }
 </style>
 </head>
@@ -400,6 +447,13 @@ body {
   </div>
 </div>
 
+<!-- 广告弹窗 -->
+<div id="ad-overlay">
+  <div class="ad-box" id="ad-box">
+    <!-- 内容由 JS 动态填充 -->
+  </div>
+</div>
+
 <!-- 通关/失败遮罩 -->
 <div id="overlay">
   <div class="overlay-box">
@@ -483,7 +537,10 @@ var I18N = {
     toastMetalUsed:'天眼通！全图透视2秒', toastMetalNoEnergy:'能量不足，无法使用天眼通',
     toastFireReady:'点化功已就绪，点击相邻花墙化墙为径', toastFireUsed:'化墙为径！', toastFireNoEnergy:'能量不足，无法使用点化功',
     achNoSkill:'无术通关', achAllCollect:'全科齐收', achSpeedRun:'速通达人', achFullEnergy:'满能量通关',
-    achUnlocked:'成就解锁', overlayStars:'星级评价', speedThreshold:'60秒内'
+    achUnlocked:'成就解锁', overlayStars:'星级评价', speedThreshold:'60秒内',
+    adTitle:'能量耗尽', adDesc:'看广告恢复20能量，继续探索', adWatch:'看广告 +20能量',
+    adPlaying:'广告播放中', adDone:'能量恢复！+20', adRestart:'重新开始',
+    adUsed:'本关广告已使用', adNote:'演示版 · 正式版接入广告SDK', adSkip:'跳过'
   },
   en: {
     title:'Melon Maze', subtitle:'Flower Field Melon Maze', footer:'Five Arts · Blind Box · Rank Up', story:'Deep in flower fields, blossoms bear melons.<br>Master the Five Arts, seek the path, find the melon.',
@@ -518,7 +575,10 @@ var I18N = {
     toastMetalUsed:'Heaven Eye! Full map revealed 2s', toastMetalNoEnergy:'Not enough energy for Heaven Eye',
     toastFireReady:'Transform ready. Tap adjacent wall to convert', toastFireUsed:'Wall to path!', toastFireNoEnergy:'Not enough energy for Transform',
     achNoSkill:'No Skill Clear', achAllCollect:'All Melons', achSpeedRun:'Speed Runner', achFullEnergy:'Full Energy',
-    achUnlocked:'Achievement Unlocked', overlayStars:'Stars', speedThreshold:'under 60s'
+    achUnlocked:'Achievement Unlocked', overlayStars:'Stars', speedThreshold:'under 60s',
+    adTitle:'Energy Depleted', adDesc:'Watch ad to restore 20 energy', adWatch:'Watch Ad +20 Energy',
+    adPlaying:'Ad playing', adDone:'Energy Restored! +20', adRestart:'Restart',
+    adUsed:'Ad already used this level', adNote:'Demo · Ad SDK in full version', adSkip:'Skip'
   },
   ja: {
     title:'吃瓜迷陣', subtitle:'花田瓜陣', footer:'五大奇功 · 盲盒吃瓜 · 等級昇進', story:'花田深く、花は瓜を実らす。<br>五大奇功、道を探り瓜を求める。',
@@ -553,7 +613,10 @@ var I18N = {
     toastMetalUsed:'天眼通！全図透視2秒', toastMetalNoEnergy:'天眼通のエネルギー不足',
     toastFireReady:'点化功発動。隣接する花壁をタップ', toastFireUsed:'化壁為径！', toastFireNoEnergy:'点化功のエネルギー不足',
     achNoSkill:'無功クリア', achAllCollect:'全瓜収集', achSpeedRun:'速攻達人', achFullEnergy:'満エネクリア',
-    achUnlocked:'実績解除', overlayStars:'星評価', speedThreshold:'60秒以内'
+    achUnlocked:'実績解除', overlayStars:'星評価', speedThreshold:'60秒以内',
+    adTitle:'エネルギー切れ', adDesc:'広告視聴で20エネルギー回復', adWatch:'広告視聴 +20エネルギー',
+    adPlaying:'広告再生中', adDone:'エネルギー回復！+20', adRestart:'リスタート',
+    adUsed:'この関の広告は使用済み', adNote:'デモ版 · 正式版は広告SDK導入予定', adSkip:'スキップ'
   },
   ko: {
     title:'과일 미궁', subtitle:'화전과진', footer:'오대기공 · 블라인드박스 · 등급 승급', story:'화전 깊은 곳, 꽃이 과일을 맺는다.<br>오대기공, 길을 찾아 과일을 구하다.',
@@ -588,7 +651,10 @@ var I18N = {
     toastMetalUsed:'천안통! 전체 지도 2초 표시', toastMetalNoEnergy:'천안통 에너지 부족',
     toastFireReady:'점화공 준비. 인접 꽃벽 탭', toastFireUsed:'벽이 길로!', toastFireNoEnergy:'점화공 에너지 부족',
     achNoSkill:'무술 클리어', achAllCollect:'전과 수집', achSpeedRun:'속공 달인', achFullEnergy:'풀에너지',
-    achUnlocked:'업적 해금', overlayStars:'별점', speedThreshold:'60초 이내'
+    achUnlocked:'업적 해금', overlayStars:'별점', speedThreshold:'60초 이내',
+    adTitle:'에너지 소진', adDesc:'광고 시청으로 20 에너지 회복', adWatch:'광고 시청 +20 에너지',
+    adPlaying:'광고 재생 중', adDone:'에너지 회복! +20', adRestart:'다시 시작',
+    adUsed:'이 관의 광고는 사용됨', adNote:'데모판 · 정식판은 광고 SDK 도입 예정', adSkip:'건너뛰기'
   }
 };
 
@@ -2699,6 +2765,7 @@ function getGridFromMouse3D(clientX, clientY) {
 
 function on3DClick(e) {
   if (G.paused || celebration.active) return;
+  if (document.getElementById('ad-overlay').classList.contains('show')) return;
   var grid = getGridFromMouse3D(e.clientX, e.clientY);
   if (!grid) return;
 
@@ -2727,6 +2794,7 @@ function on3DTouchStart(e) {
 function on3DTouchEnd(e) {
   e.preventDefault();
   if (!touchStart3D || G.paused || celebration.active) return;
+  if (document.getElementById('ad-overlay').classList.contains('show')) return;
   var touch = e.changedTouches[0];
   var dx = touch.clientX - touchStart3D.x;
   var dy = touch.clientY - touchStart3D.y;
@@ -2852,6 +2920,8 @@ function startLevel(idx) {
   G.moveHistory = [];
   G.fullPath = [];
   G.skillUsed = false;
+  G.adUsed = false;
+  G.adOfferShown = false;
   G.skillCardsShown = {};
   G.levelCardsShown = {};
   G.burnedWalls = {};
@@ -3049,6 +3119,7 @@ function eatMelon(melonKey, x, y) {
 function toggleSkill(skill) {
   var cfg = SKILL_CONFIG[skill];
   if (!cfg) return;
+  if (document.getElementById('ad-overlay').classList.contains('show')) return;
   if (G.energy < cfg.cost) {
     showToast(t('toast' + skill.charAt(0).toUpperCase() + skill.slice(1) + 'NoEnergy'));
     return;
@@ -3290,6 +3361,12 @@ function updateUI() {
   document.getElementById('skill-water').disabled = G.energy < 4 || G.moveHistory.length < 1;
   document.getElementById('skill-metal').disabled = G.energy < 6;
   document.getElementById('skill-fire').disabled = G.energy < 8;
+
+  // 能量耗尽检查：弹广告offer
+  if (G.energy <= 0 && !G.adOfferShown && !G.paused) {
+    G.adOfferShown = true;
+    showAdOffer();
+  }
 }
 
 // ======================== 通关 ========================
@@ -3860,11 +3937,84 @@ function flashPortal(pairIdx) {
   setTimeout(function(){ fl.classList.remove('flash'); }, 300);
 }
 
+// ======================== 模拟广告系统 ========================
+var adCountdownTimer = null;
+
+function showAdOffer() {
+  var box = document.getElementById('ad-box');
+  if (G.adUsed) {
+    // 广告已用，只能重启
+    box.innerHTML =
+      '<div class="ad-icon">⚡</div>' +
+      '<div class="ad-title">' + t('adTitle') + '</div>' +
+      '<div class="ad-desc">' + t('adUsed') + '</div>' +
+      '<button class="ad-btn-restart" onclick="restartLevel()">' + t('adRestart') + '</button>';
+  } else {
+    box.innerHTML =
+      '<div class="ad-icon">⚡</div>' +
+      '<div class="ad-title">' + t('adTitle') + '</div>' +
+      '<div class="ad-desc">' + t('adDesc') + '</div>' +
+      '<button class="ad-btn-watch" id="ad-btn-watch" onclick="startAdCountdown()">' + t('adWatch') + '</button>' +
+      '<button class="ad-btn-restart" onclick="restartLevel()">' + t('adRestart') + '</button>' +
+      '<div class="ad-note">' + t('adNote') + '</div>';
+  }
+  document.getElementById('ad-overlay').classList.add('show');
+}
+
+function startAdCountdown() {
+  var box = document.getElementById('ad-box');
+  var seconds = 3;
+  box.innerHTML =
+    '<div class="ad-icon">📺</div>' +
+    '<div class="ad-title">' + t('adPlaying') + '</div>' +
+    '<div class="ad-countdown" id="ad-countdown">' + seconds + '</div>' +
+    '<div class="ad-progress"><div class="ad-progress-bar" id="ad-progress-bar" style="width:0%"></div></div>' +
+    '<div class="ad-note">' + t('adNote') + '</div>';
+
+  var cdEl = document.getElementById('ad-countdown');
+  var barEl = document.getElementById('ad-progress-bar');
+
+  adCountdownTimer = setInterval(function() {
+    seconds--;
+    if (seconds > 0) {
+      cdEl.textContent = seconds;
+      barEl.style.width = ((3 - seconds) / 3 * 100) + '%';
+    } else {
+      clearInterval(adCountdownTimer);
+      adCountdownTimer = null;
+      barEl.style.width = '100%';
+      finishAd();
+    }
+  }, 1000);
+  // 初始进度条
+  barEl.style.width = '0%';
+}
+
+function finishAd() {
+  var box = document.getElementById('ad-box');
+  box.innerHTML =
+    '<div class="ad-icon">✅</div>' +
+    '<div class="ad-done">' + t('adDone') + '</div>';
+
+  // 加20能量，不超过上限
+  var maxE = getMaxEnergy(G.levelIdx);
+  G.energy = Math.min(G.energy + 20, maxE);
+  G.adUsed = true;
+  G.adOfferShown = false;
+
+  setTimeout(function() {
+    document.getElementById('ad-overlay').classList.remove('show');
+    updateUI();
+    render();
+  }, 1000);
+}
+
 // ======================== 键盘输入 ========================
 document.addEventListener('keydown', function(e) {
   if (document.getElementById('game-wrap').classList.contains('hidden')) return;
   if (document.getElementById('kc-modal').classList.contains('show')) return;
   if (document.getElementById('overlay').classList.contains('show')) return;
+  if (document.getElementById('ad-overlay').classList.contains('show')) return;
   if (celebration.active) return;
   switch(e.key) {
     case 'ArrowUp': case 'w': case 'W': tryMove(0,-1); e.preventDefault(); break;
