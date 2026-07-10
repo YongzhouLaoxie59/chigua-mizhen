@@ -1931,6 +1931,7 @@ var PORTAL_COLORS = [
   { color: 0xFFD700, emissive: 0xBB9900, css: '#FFD700' }
 ];
 var rawMelonMeshes3D = {};
+var startBeacon3D = null;  // 起点信标：穿透雾层的绿色光柱
 
 var playerTargetX3D = 0;
 var playerTargetZ3D = 0;
@@ -2057,7 +2058,7 @@ function buildMaze3D() {
       var fogMat = new THREE.MeshBasicMaterial({
         color: 0xDDE8F0,
         transparent: true,
-        opacity: 0.78 + Math.random() * 0.12,
+        opacity: 0.55 + Math.random() * 0.12,
         depthWrite: false,
         fog: false  // 雾瓦片本身不受场景雾影响
       });
@@ -2287,21 +2288,21 @@ function buildMaze3D() {
   playerGroup3D = new THREE.Group();
 
   var bodyGeo = new THREE.SphereGeometry(1.1, 16, 12);
-  var bodyMat = new THREE.MeshStandardMaterial({ color: 0xD85A30, roughness: 0.6 });
+  var bodyMat = new THREE.MeshStandardMaterial({ color: 0xD85A30, roughness: 0.6, fog: false });
   var body = new THREE.Mesh(bodyGeo, bodyMat);
   body.castShadow = true;
   playerGroup3D.add(body);
 
   var headGeo = new THREE.SphereGeometry(0.65, 12, 10);
-  var headMat = new THREE.MeshStandardMaterial({ color: 0x444441, roughness: 0.7 });
+  var headMat = new THREE.MeshStandardMaterial({ color: 0x444441, roughness: 0.7, fog: false });
   var head = new THREE.Mesh(headGeo, headMat);
   head.position.y = 1.3;
   head.castShadow = true;
   playerGroup3D.add(head);
 
   // 眼睛
-  var eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-  var eyePupilMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+  var eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, fog: false });
+  var eyePupilMat = new THREE.MeshStandardMaterial({ color: 0x000000, fog: false });
   var eyeWhiteGeo = new THREE.SphereGeometry(0.18, 8, 6);
   var eyePupilGeo = new THREE.SphereGeometry(0.09, 6, 4);
 
@@ -2323,7 +2324,7 @@ function buildMaze3D() {
 
   // 小帽子
   var hatGeo = new THREE.ConeGeometry(0.7, 0.7, 8);
-  var hatMat = new THREE.MeshStandardMaterial({ color: 0xD85A30, roughness: 0.5 });
+  var hatMat = new THREE.MeshStandardMaterial({ color: 0xD85A30, roughness: 0.5, fog: false });
   var hat = new THREE.Mesh(hatGeo, hatMat);
   hat.position.y = 2.2;
   hat.castShadow = true;
@@ -2333,6 +2334,29 @@ function buildMaze3D() {
   playerTargetZ3D = G.playerY * CELL_3D + CELL_3D/2;
   playerGroup3D.position.set(playerTargetX3D, 0, playerTargetZ3D);
   scene3D.add(playerGroup3D);
+
+  // 起点信标：绿色光柱+顶端光点，穿透雾层始终可见
+  startBeacon3D = new THREE.Group();
+  var beaconX = G.playerX * CELL_3D + CELL_3D/2;
+  var beaconZ = G.playerY * CELL_3D + CELL_3D/2;
+  // 光柱
+  var bpGeo = new THREE.CylinderGeometry(0.35, 0.6, 7.0, 12, 1, true);
+  var bpMat = new THREE.MeshBasicMaterial({
+    color: 0x5DCAA5, transparent: true, opacity: 0.28,
+    side: THREE.DoubleSide, depthWrite: false, fog: false
+  });
+  var beaconPillar = new THREE.Mesh(bpGeo, bpMat);
+  beaconPillar.position.set(beaconX, 3.5, beaconZ);
+  startBeacon3D.add(beaconPillar);
+  // 顶端光点
+  var btGeo = new THREE.SphereGeometry(0.45, 12, 8);
+  var btMat = new THREE.MeshBasicMaterial({
+    color: 0x5DCAA5, transparent: true, opacity: 0.5, fog: false
+  });
+  var beaconTip = new THREE.Mesh(btGeo, btMat);
+  beaconTip.position.set(beaconX, 7.0, beaconZ);
+  startBeacon3D.add(beaconTip);
+  scene3D.add(startBeacon3D);
 
   // 雷达球（苦瓜buff时显示）
   var rGeo = new THREE.SphereGeometry(CELL_3D * 4, 16, 12);
@@ -2413,6 +2437,15 @@ function clearMaze3D() {
     radarSphere3D.geometry.dispose();
     radarSphere3D.material.dispose();
     radarSphere3D = null;
+  }
+
+  if (startBeacon3D) {
+    scene3D.remove(startBeacon3D);
+    startBeacon3D.traverse(function(child) {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) child.material.dispose();
+    });
+    startBeacon3D = null;
   }
 
   for (var i = 0; i < highlightMeshes3D.length; i++) {
@@ -2617,8 +2650,15 @@ function animate3D() {
   for (var key in fogTiles3D) {
     var fTile = fogTiles3D[key];
     if (fTile.visible) {
-      fTile.material.opacity = 0.72 + Math.sin(t * 0.8 + fTile.userData.phase) * 0.12;
+      fTile.material.opacity = 0.50 + Math.sin(t * 0.8 + fTile.userData.phase) * 0.12;
     }
+  }
+
+  // 起点信标脉动（穿透雾层始终可见）
+  if (startBeacon3D && startBeacon3D.children.length >= 2) {
+    startBeacon3D.children[0].material.opacity = 0.22 + Math.sin(t * 2.0) * 0.12;
+    startBeacon3D.children[1].position.y = 7.0 + Math.sin(t * 2.5) * 0.25;
+    startBeacon3D.children[1].material.opacity = 0.4 + Math.sin(t * 3.0) * 0.2;
   }
 
   // 传送门旋转+脉冲+光柱脉动+配对光束
