@@ -468,7 +468,7 @@ body {
 </div>
 
 <!-- 知识卡弹窗 -->
-<div id="kc-modal">
+<div id="kc-modal" onclick="if(event.target===this)closeKc()">
   <div class="kc-box">
     <div class="kc-header">
       <div class="kc-emoji" id="kc-emoji"></div>
@@ -2807,6 +2807,9 @@ function getGridFromMouse3D(clientX, clientY) {
 function on3DClick(e) {
   if (G.paused || celebration.active) return;
   if (document.getElementById('ad-overlay').classList.contains('show')) return;
+  if (document.getElementById('kc-modal').classList.contains('show')) return;
+  if (document.getElementById('overlay').classList.contains('show')) return;
+  if (document.getElementById('level-select-modal').classList.contains('show')) return;
   var grid = getGridFromMouse3D(e.clientX, e.clientY);
   if (!grid) return;
 
@@ -2836,6 +2839,9 @@ function on3DTouchEnd(e) {
   e.preventDefault();
   if (!touchStart3D || G.paused || celebration.active) return;
   if (document.getElementById('ad-overlay').classList.contains('show')) return;
+  if (document.getElementById('kc-modal').classList.contains('show')) return;
+  if (document.getElementById('overlay').classList.contains('show')) return;
+  if (document.getElementById('level-select-modal').classList.contains('show')) return;
   var touch = e.changedTouches[0];
   var dx = touch.clientX - touchStart3D.x;
   var dy = touch.clientY - touchStart3D.y;
@@ -3163,7 +3169,9 @@ function eatMelon(melonKey, x, y) {
 function toggleSkill(skill) {
   var cfg = SKILL_CONFIG[skill];
   if (!cfg) return;
+  if (G.paused) return;
   if (document.getElementById('ad-overlay').classList.contains('show')) return;
+  if (document.getElementById('kc-modal').classList.contains('show')) return;
   if (G.energy < cfg.cost) {
     showToast(t('toast' + skill.charAt(0).toUpperCase() + skill.slice(1) + 'NoEnergy'));
     return;
