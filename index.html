@@ -2220,8 +2220,8 @@ function buildMaze3D() {
         if (destKey) {
           var destParts = destKey.split(',');
           var dx = parseInt(destParts[0]), dy = parseInt(destParts[1]);
-          var dwx = (dx - G.cols/2) * CELL;
-          var dwz = (dy - G.rows/2) * CELL;
+          var dwx = dx * CELL_3D + CELL_3D/2;
+          var dwz = dy * CELL_3D + CELL_3D/2;
           var dist = Math.sqrt((dwx-wx)*(dwx-wx) + (dwz-wz)*(dwz-wz));
           var beamGeo = new THREE.CylinderGeometry(0.12, 0.12, dist, 6);
           var beamMat = new THREE.MeshBasicMaterial({
@@ -3018,9 +3018,13 @@ function startLevel(idx) {
   document.getElementById('game-wrap').classList.remove('hidden');
   document.getElementById('lv-display').textContent = t('levelPrefix') + (idx+1) + t('levelSuffix');
 
-  buildMaze3D();
-  updateUI();
-  startGameLoop();
+  try {
+    buildMaze3D();
+    updateUI();
+    startGameLoop();
+  } catch(e) {
+    console.error('startLevel 3D init error:', e);
+  }
   // 关卡知识卡
   if (!G.levelCardsShown[idx]) {
     G.levelCardsShown[idx] = true;
