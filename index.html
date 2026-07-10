@@ -2437,8 +2437,9 @@ function clearMaze3D() {
     if (portalMeshes3D[key].tip) disposeMesh(portalMeshes3D[key].tip);
   }
   portalMeshes3D = {};
-  portalPairs = {};
-  portalPairIndex = {};
+  // 注意：portalPairs 和 portalPairIndex 不在此清理
+  // startLevel() 在调用 buildMaze3D() 之前已初始化它们，
+  // 若此处清空会导致 tryMove 中传送门查找失效
 }
 
 function updateScene3D() {
@@ -2902,6 +2903,9 @@ function closeLevelSelect() {
 
 function startLevel(idx) {
   tryStartBgm();
+  // 关闭广告弹窗（防止从广告弹窗中点"重新开局"后遮罩残留）
+  document.getElementById('ad-overlay').classList.remove('show');
+  if (adCountdownTimer) { clearInterval(adCountdownTimer); adCountdownTimer = null; }
   G.levelIdx = idx;
   var level = LEVELS[idx];
   G.grid = level.grid.map(function(row){ return row.slice(); });
@@ -3603,6 +3607,8 @@ function restartLevel() {
 
 function backToEntry() {
   document.getElementById('overlay').classList.remove('show');
+  document.getElementById('ad-overlay').classList.remove('show');
+  if (adCountdownTimer) { clearInterval(adCountdownTimer); adCountdownTimer = null; }
   document.getElementById('level-select-modal').classList.remove('show');
   document.getElementById('game-wrap').classList.add('hidden');
   document.getElementById('entry-screen').classList.remove('hidden');
