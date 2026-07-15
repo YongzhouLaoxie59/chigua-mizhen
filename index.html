@@ -2236,7 +2236,7 @@ function buildMaze3D() {
         }
 
         scene3D.add(pGroup);
-        portalMeshes3D[key] = { ring: ring, glow: glow, beam: beamMesh, pillar: pillar, tip: tip, pairIdx: pIdx };
+        portalMeshes3D[key] = { group: pGroup, ring: ring, glow: glow, beam: beamMesh, pillar: pillar, tip: tip, pairIdx: pIdx };
       }
 
       if (G.melons[key]) {
@@ -2463,11 +2463,17 @@ function clearMaze3D() {
   celebrationParticles3D = [];
 
   for (var key in portalMeshes3D) {
-    if (portalMeshes3D[key].ring) disposeMesh(portalMeshes3D[key].ring);
-    if (portalMeshes3D[key].glow) disposeMesh(portalMeshes3D[key].glow);
-    if (portalMeshes3D[key].beam) disposeMesh(portalMeshes3D[key].beam);
-    if (portalMeshes3D[key].pillar) disposeMesh(portalMeshes3D[key].pillar);
-    if (portalMeshes3D[key].tip) disposeMesh(portalMeshes3D[key].tip);
+    var pm = portalMeshes3D[key];
+    // 先从场景移除整个 pGroup（包括 ring/glow/pillar/tip 子对象）
+    if (pm.group) {
+      scene3D.remove(pm.group);
+      pm.group.traverse(function(child) {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) child.material.dispose();
+      });
+    }
+    // beam 是直接添加到 scene3D 的，单独移除
+    if (pm.beam) disposeMesh(pm.beam);
   }
   portalMeshes3D = {};
   // 注意：portalPairs 和 portalPairIndex 不在此清理
@@ -3094,8 +3100,12 @@ function tryMove(dx, dy) {
     return;
   }
 
-  if (G.energy < 0.5) {
-    showToast(t('toastNoEnergy'));
+  if (G.energy < 0.8) {
+    // 能量不够走一步，触发广告offer（showAdOffer内部处理adUsed情况）
+    if (!G.adOfferShown && !G.paused) {
+      G.adOfferShown = true;
+      showAdOffer();
+    }
     return;
   }
 
@@ -3446,8 +3456,8 @@ function updateUI() {
   document.getElementById('skill-metal').disabled = G.energy < 6;
   document.getElementById('skill-fire').disabled = G.energy < 8;
 
-  // 能量耗尽检查：弹广告offer
-  if (G.energy <= 0 && !G.adOfferShown && !G.paused) {
+  // 能量不足以移动时：弹广告offer（不够走一步就触发）
+  if (G.energy < 0.8 && !G.adOfferShown && !G.paused) {
     G.adOfferShown = true;
     showAdOffer();
   }
