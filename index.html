@@ -1704,13 +1704,27 @@ function getMaxEnergy(idx) {
 }
 
 var RANKS = [
-  { names:{ zh:'吃瓜新手', en:'Melon Rookie', ja:'吃瓜ルーキー', ko:'과일 루키' }, maxEnergy:25, color:'#97C459' },
-  { names:{ zh:'吃瓜小咖', en:'Melon Fan',    ja:'吃瓜ファン',   ko:'과일 팬'    }, maxEnergy:32, color:'#5DCAA5' },
-  { names:{ zh:'吃瓜达人', en:'Melon Expert', ja:'吃瓜プロ',     ko:'과일 프로'  }, maxEnergy:48, color:'#FAC775' },
-  { names:{ zh:'吃瓜大神', en:'Melon Master', ja:'吃瓜マスター', ko:'과일 마스ター'}, maxEnergy:60, color:'#D85A30' },
-  { names:{ zh:'吃瓜宗师', en:'Melon Sage',   ja:'吃瓜セイジ',   ko:'과일 세이지'}, maxEnergy:70, color:'#9B59B6' },
-  { names:{ zh:'吃瓜传奇', en:'Melon Legend', ja:'吃瓜レジェンド',ko:'과일 레전드'}, maxEnergy:78, color:'#E74C3C' }
+  { names:{ zh:'吃瓜新手', en:'Melon Rookie',    ja:'吃瓜ルーキー',     ko:'과일 루키'     }, maxEnergy:25, color:'#97C459' },
+  { names:{ zh:'吃瓜小咖', en:'Melon Fan',       ja:'吃瓜ファン',       ko:'과일 팬'       }, maxEnergy:32, color:'#5DCAA5' },
+  { names:{ zh:'吃瓜达人', en:'Melon Expert',    ja:'吃瓜プロ',         ko:'과일 프로'     }, maxEnergy:48, color:'#FAC775' },
+  { names:{ zh:'吃瓜大神', en:'Melon Master',    ja:'吃瓜マスター',     ko:'과일 마스ター'  }, maxEnergy:60, color:'#D85A30' },
+  { names:{ zh:'吃瓜宗师', en:'Melon Sage',      ja:'吃瓜セイジ',       ko:'과일 세이지'   }, maxEnergy:70, color:'#9B59B6' },
+  { names:{ zh:'吃瓜传奇', en:'Melon Legend',    ja:'吃瓜レジェンド',   ko:'과일 레전드'   }, maxEnergy:78, color:'#E74C3C' },
+  { names:{ zh:'吃瓜圣手', en:'Melon Saint',     ja:'吃瓜セイント',     ko:'과일 세인트'   }, maxEnergy:78, color:'#C0392B' },
+  { names:{ zh:'吃瓜仙尊', en:'Melon Immortal',  ja:'吃瓜イモータル',   ko:'과일 이모탈'   }, maxEnergy:78, color:'#8E44AD' },
+  { names:{ zh:'吃瓜帝君', en:'Melon Emperor',   ja:'吃瓜エンペラー',   ko:'과일 엠페러'   }, maxEnergy:78, color:'#F39C12' },
+  { names:{ zh:'吃瓜至尊', en:'Melon Supreme',   ja:'吃瓜シュープリーム',ko:'과일 슈프림'  }, maxEnergy:78, color:'#E91E63' }
 ];
+
+// 关卡索引→等级索引映射（前5关1:1，之后每3关升一级）
+function levelToRank(idx) {
+  if (idx < 5) return idx;        // L1-5: 新手→宗师
+  if (idx < 8) return 5;          // L6-8: 传奇
+  if (idx < 11) return 6;         // L9-11: 圣手
+  if (idx < 14) return 7;         // L12-14: 仙尊
+  if (idx < 17) return 8;         // L15-17: 帝君
+  return 9;                        // L18-20: 至尊
+}
 
 // ======================== 游戏状态 ========================
 var G = {
@@ -1766,7 +1780,8 @@ function tl(levelIdx, field) {
 }
 
 function tr(rankIdx) {
-  return RANKS[Math.min(rankIdx, RANKS.length-1)].names[currentLang] || RANKS[Math.min(rankIdx, RANKS.length-1)].names.zh;
+  var ri = levelToRank(rankIdx);
+  return RANKS[ri].names[currentLang] || RANKS[ri].names.zh;
 }
 
 function changeLanguage(lang) {
@@ -2124,7 +2139,7 @@ function buildMaze3D() {
         // 出口传送门
         G.exitGridX = x;
         G.exitGridY = y;
-        var rankColor = RANKS[Math.min(G.levelIdx, RANKS.length-1)].color;
+        var rankColor = RANKS[levelToRank(G.levelIdx)].color;
         var colorHex = parseInt(rankColor.replace('#', '0x'));
         var eGeo = new THREE.CylinderGeometry(1.4, 1.4, WALL_HEIGHT, 16);
         var eMat = new THREE.MeshStandardMaterial({
@@ -3496,7 +3511,7 @@ function showOverlay() {
   if (stars > prevStars) localStorage.setItem(starKey, stars.toString());
 
   document.getElementById('overlay-title').textContent = t('overlayClear');
-  document.getElementById('overlay-title').style.color = RANKS[Math.min(G.levelIdx, RANKS.length-1)].color;
+  document.getElementById('overlay-title').style.color = RANKS[levelToRank(G.levelIdx)].color;
   document.getElementById('overlay-desc').innerHTML =
     t('overlayTime') + '\uFF1A' + time + t('overlayTimeUnit') + '<br>' +
     t('overlayCollected') + '\uFF1A' + collected + t('overlayCollectedUnit') + '<br>' +
